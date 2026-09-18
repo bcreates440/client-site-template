@@ -1,0 +1,56 @@
+{%- comment -%}
+  Text on one side, a photograph on the other.
+
+  The pieces appear in this order, and any of them can be left out:
+    eyebrow, heading, lede, body, checks, body_after, facts, buttons
+
+  nested: true wraps the two columns in an inner div. A handful of sections
+  were built that way; leave it off unless you are matching one of them.
+{%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'navy' }}"{% if b.id %} id="{{ b.id }}"{% endif %}>
+    <div class="wrap{% unless b.nested %} split{% endunless %}">
+      {%- if b.nested %}
+      <div class="split">
+      {%- endif %}
+      {%- if b.image_first %}
+      <img src="{{ b.image }}" {% if b.image_width %}width="{{ b.image_width }}" height="{{ b.image_height }}" {% endif %}{% if b.image_priority %}fetchpriority="high"{% else %} loading="lazy"{% endif %}
+                 alt="{{ b.image_alt }}">
+      {%- endif %}
+      <div>
+        {%- if b.eyebrow %}
+        <p class="eyebrow">{{ b.eyebrow }}</p>
+        {%- endif %}
+        <h2>{{ b.heading }}</h2>
+        {%- if b.lede %}
+        <p class="lede">{% include md.html text=b.lede inline=true %}</p>
+        {%- endif %}
+        {% include md.html text=b.body %}
+        {%- if b.checks %}
+        <ul class="checks">
+          {%- for c in b.checks %}
+          <li>{% include md.html text=c inline=true %}</li>
+          {%- endfor %}
+        </ul>
+        {%- endif %}
+        {%- if b.body_after %}
+        <p>{% include md.html text=b.body_after inline=true %}</p>
+        {%- endif %}
+        {%- if b.facts %}
+        <ul class="facts">
+          {%- for f in b.facts %}
+          <li><b>{{ f.term }}</b><span>{% include md.html text=f.detail inline=true %}</span></li>
+          {%- endfor %}
+        </ul>
+        {%- endif %}
+        {%- include blocks/buttons.html buttons=b.buttons %}
+      </div>
+      {%- unless b.image_first %}
+      <img src="{{ b.image }}" {% if b.image_width %}width="{{ b.image_width }}" height="{{ b.image_height }}" {% endif %}{% if b.image_priority %}fetchpriority="high"{% else %} loading="lazy"{% endif %}
+           alt="{{ b.image_alt }}">
+      {%- endunless %}
+      {%- if b.nested %}
+      </div>
+      {%- endif %}
+    </div>
+  </section>

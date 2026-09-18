@@ -1,0 +1,7 @@
+# The links along the top of every page, and the "Explore" list in the
+# footer. Drag to reorder in the editor. A page added here must already
+# exist in _content/.
+items:
+  - slug: index
+    url: index.html
+    label: Home

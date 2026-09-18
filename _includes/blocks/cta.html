@@ -1,0 +1,11 @@
+{%- comment -%} The closing red band that asks the visitor to do something. {%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'red' }}">
+    <div class="wrap narrow center">
+      <h2>{{ b.heading }}</h2>
+      {%- if b.lede %}
+      <p class="lede" style="color:#FFE2E4">{%- include md.html text=b.lede inline=true %}</p>
+      {%- endif %}
+      {%- include blocks/buttons.html buttons=b.buttons center=true %}
+    </div>
+  </section>

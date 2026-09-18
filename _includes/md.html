@@ -1,0 +1,24 @@
+{%- comment -%}
+  Turns a piece of writing into HTML, and fills in the shortcuts below so that
+  facts which appear in ordinary sentences still come from _data/site.yml and
+  only ever have to be changed in one place.
+
+  Type this            to get this
+    [[org]]              the association/business name
+    [[phone]]            the phone number
+    [[email]]            the email address
+    [[address]]          the mailing address
+
+  Add more shortcuts here as a client's site needs them - one line each,
+  following the pattern below.
+
+  Pass inline=true for a fragment that must not be wrapped in its own
+  paragraph, such as a button note or the lede in a closing banner.
+{%- endcomment -%}
+{%- assign s = site.data.site -%}
+{%- assign t = include.text -%}
+{%- assign t = t | replace: '[[org]]',     s.org_name -%}
+{%- assign t = t | replace: '[[phone]]',   s.phone -%}
+{%- assign t = t | replace: '[[email]]',   s.email -%}
+{%- assign t = t | replace: '[[address]]', s.address -%}
+{%- if include.inline %}{{ t }}{% else %}{{ t | markdownify }}{% endif -%}

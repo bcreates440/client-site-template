@@ -1,0 +1,22 @@
+{%- comment -%}
+  A single row of photographs, edge to edge. Unlike the gallery block these
+  have no captions.
+{%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'cream' }}"{% if b.id %} id="{{ b.id }}"{% endif %}>
+    <div class="wrap">
+      <div class="center" style="margin-bottom:{{ b.heading_gap | default: '1.6rem' }}">
+        {%- if b.eyebrow %}
+        <p class="eyebrow">{{ b.eyebrow }}</p>
+        {%- endif %}
+        <h2>{{ b.heading }}</h2>
+      </div>
+      <div class="strip">
+        {%- for photo in b.photos %}
+        <img src="{{ photo.image }}" {% if photo.width %}width="{{ photo.width }}" height="{{ photo.height }}" {% endif %}loading="lazy"
+             alt="{{ photo.alt }}">
+        {%- endfor %}
+      </div>
+      {%- include blocks/buttons.html buttons=b.buttons center=true style=b.buttons_style %}
+    </div>
+  </section>

@@ -1,0 +1,28 @@
+# ===========================================================================
+#  THE FACTS THAT APPEAR EVERYWHERE
+#
+#  Change something here and it changes on every page at once - the footer,
+#  the buttons, and the data Google reads.
+#
+#  Anything in here can also be edited in the website editor at /admin/
+#  under "Site-wide details".
+# ===========================================================================
+
+org_name:   "Example Client Name"
+org_blurb:  "One sentence describing what this business or organization does."
+
+# --- how people reach them --------------------------------------------------
+address:      "123 Main Street, Example Town, WY 82501"
+email:        "hello@example.com"
+
+# Written out for people, and again in the format a phone can dial. BOTH
+# must be changed together.
+phone:        "(307) 555-0100"
+phone_dial:   "+13075550100"
+
+# --- elsewhere on the web ----------------------------------------------------
+facebook:     ""
+instagram:    ""
+
+# --- the picture used when a link is shared on Facebook etc. ----------------
+share_image:  "images/logo.png"

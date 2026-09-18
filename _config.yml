@@ -1,0 +1,49 @@
+# ===========================================================================
+#  Jekyll settings
+#
+#  GitHub Pages reads this file and builds the site automatically every time
+#  you save a change. There is nothing to run yourself.
+# ===========================================================================
+
+# The address the finished website lives at. Used to build the canonical and
+# social-sharing tags that search engines read.
+#
+# IMPORTANT: leave this pointing at the real domain even while the site is
+# still being previewed at <owner>.github.io. It tells Google that the real
+# domain is the real address, which is what stops the preview copy competing
+# with the real site in search results.
+# TODO: set to the client's real domain
+url: "https://example.com"
+baseurl: ""
+
+# TODO: set both of these for the client
+title: "Example Client Name"
+description: "One sentence describing what this business or organization does."
+
+# Every page lives in _content/. They come out as /index.html, /about.html and
+# so on, because each file states its own permalink.
+collections:
+  content:
+    output: true
+
+defaults:
+  - scope: { path: "", type: "content" }
+    values: { layout: "page" }
+
+# Folders that are working files, not part of the finished website.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - check.rb
+  - README.md
+
+# Keep the built output tidy and predictable.
+sass:
+  style: compressed
+
+# Markdown settings.
+#   smart_quotes off: an apostrophe stays a plain ' rather than becoming a
+#   curly one.
+kramdown:
+  smart_quotes: ["apos", "apos", "quot", "quot"]

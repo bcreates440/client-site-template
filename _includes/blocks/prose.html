@@ -1,0 +1,45 @@
+{%- comment -%}
+  Ordinary writing: a heading and some paragraphs. Use "callout" for the boxed
+  note that needs to stand out.
+{%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'paper' }}">
+    <div class="wrap{% if b.narrow != false %} narrow{% endif %}{% if b.center %} center{% endif %}">
+      {%- if b.eyebrow %}
+      <p class="eyebrow">{{ b.eyebrow }}</p>
+      {%- endif %}
+      {%- if b.heading %}
+      <h2>{{ b.heading }}</h2>
+      {%- endif %}
+      {%- if b.lede %}
+      <p class="lede">{% include md.html text=b.lede inline=true %}</p>
+      {%- endif %}
+      {% include md.html text=b.body %}
+      {%- if b.facts %}
+      <ul class="facts">
+        {%- for f in b.facts %}
+        <li><b>{{ f.term }}</b><span>{% include md.html text=f.detail inline=true %}</span></li>
+        {%- endfor %}
+      </ul>
+      {%- endif %}
+      {%- if b.cards %}
+      <div class="grid {{ b.cards_columns | default: 'g2' }}"{% if b.cards_style %} style="{{ b.cards_style }}"{% endif %}>
+        {%- for card in b.cards %}
+        <article class="card{% if b.cards_accent %} card-accent{% endif %}">
+          <h3>{{ card.title }}</h3>
+          {% include md.html text=card.body %}
+        </article>
+        {%- endfor %}
+      </div>
+      {%- endif %}
+      {%- if b.callout %}
+      <div class="note{% if b.callout_style %} {{ b.callout_style }}{% endif %}">
+        {% include md.html text=b.callout %}
+      </div>
+      {%- endif %}
+      {%- if b.body_after %}
+      <p{% if b.after_style %} style="{{ b.after_style }}"{% endif %}>{% include md.html text=b.body_after inline=true %}</p>
+      {%- endif %}
+      {%- include blocks/buttons.html buttons=b.buttons center=b.center %}
+    </div>
+  </section>

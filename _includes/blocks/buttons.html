@@ -1,0 +1,16 @@
+{%- comment -%}
+  A row of buttons. Each button is either
+     link:  the name of a link in _data/site.yml  (tickets_url, vendors_url, join_url)
+     url:   any other address, e.g. contact.html
+  style is primary (red), navy, or ghost (outline).
+  Anything pointing off this website opens in a new tab automatically.
+{%- endcomment -%}
+{%- assign row = include.buttons -%}
+{%- if row and row.size > 0 -%}
+<div class="btn-row{% if include.center %} center{% endif %}"{% if include.style %} style="{{ include.style }}"{% endif %}>
+{%- for btn in row %}
+  {%- if btn.link %}{% assign href = site.data.site[btn.link] %}{% else %}{% assign href = btn.url %}{% endif %}
+  <a class="btn btn-{{ btn.style | default: 'primary' }}" href="{{ href }}"{% if href contains '://' %} target="_blank" rel="noopener"{% endif %}>{{ btn.label }}</a>
+{%- endfor %}
+</div>
+{%- endif -%}

@@ -1,0 +1,12 @@
+{%- comment -%} The band at the top of a page: small label, main heading, intro. {%- endcomment -%}
+{%- assign b = include.b -%}
+  <div class="pagehead">
+    <div class="wrap">
+      {%- if b.eyebrow %}
+      <p class="eyebrow">{{ b.eyebrow }}</p>
+      {%- endif %}
+      <h1>{{ b.heading }}</h1>
+      {% include md.html text=b.intro %}
+      {%- include blocks/buttons.html buttons=b.buttons center=true style="margin-top:1.6rem" %}
+    </div>
+  </div>

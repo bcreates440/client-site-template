@@ -1,0 +1,47 @@
+{%- comment -%}
+  The shape every page shares: head, the logo bar and navigation, the page's
+  own content, then the footer.
+
+  A page is built from a list of sections ("blocks") set at the top of its file
+  in _content/. Each block names its type, and that type's include below decides
+  how it looks. Adding a new kind of section means adding a file in
+  _includes/blocks/ and one line to the list here.
+{%- endcomment -%}
+<!doctype html>
+<html lang="en">
+<head>
+{%- include head.html %}
+</head>
+<body>
+{% include header.html %}
+<main id="main">
+{%- if page.blocks %}
+{%- for b in page.blocks %}
+{%- case b.type %}
+{%- when 'pagehead' %}{% include blocks/pagehead.html b=b %}
+{%- when 'hero' %}{% include blocks/hero.html b=b %}
+{%- when 'prose' %}{% include blocks/prose.html b=b %}
+{%- when 'cards' %}{% include blocks/cards.html b=b %}
+{%- when 'split' %}{% include blocks/split.html b=b %}
+{%- when 'table' %}{% include blocks/table.html b=b %}
+{%- when 'gallery' %}{% include blocks/gallery.html b=b %}
+{%- when 'people' %}{% include blocks/people.html b=b %}
+{%- when 'cta' %}{% include blocks/cta.html b=b %}
+{%- when 'strip' %}{% include blocks/strip.html b=b %}
+{%- when 'carousel' %}{% include blocks/carousel.html b=b %}
+{%- when 'stats' %}{% include blocks/stats.html b=b %}
+{%- when 'raw' %}{{ b.html }}
+{%- else %}<!-- unknown block type "{{ b.type }}" - check the spelling against _includes/blocks/ -->
+{%- endcase %}
+{%- endfor %}
+{%- else %}
+{{ content }}
+{%- endif %}
+</main>
+
+{% include footer.html %}
+{%- if page.countdown %}
+{% include countdown.html %}
+{%- endif %}
+</body>
+</html>

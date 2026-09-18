@@ -1,0 +1,7 @@
+# Used by the "Officers or directors" (People) block. Edit under "Team" in
+# the website editor's sidebar - change a name here once and it follows
+# everywhere the People block is used.
+team:
+  - name: "Jane Example"
+    role: "Owner"
+    email: "jane@example.com"

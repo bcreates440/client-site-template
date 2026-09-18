@@ -1,0 +1,554 @@
+# ===========================================================================
+#  WEBSITE EDITOR - settings
+#
+#  This file describes every box that appears in the editor at /admin/.
+#
+#  ONE RULE MATTERS MORE THAN ANY OTHER:
+#  the editor rewrites a page from this list of fields when it saves. If a
+#  setting exists in a page but is NOT listed here, saving that page THROWS IT
+#  AWAY. So if you add something new to a page by hand, add it here too.
+#  Run `ruby check.rb` after any manual template change - it catches this.
+# ===========================================================================
+
+backend:
+  name: github
+  # TODO: set this to <owner>/<this-client's-repo>, e.g. bcreates440/acme-site
+  repo: OWNER/REPO
+  branch: main
+  # --- OAUTH LOGIN -------------------------------------------------------
+  # GitHub Pages cannot handle the login handshake by itself, so it is done
+  # by a small free service shared across every client site - see
+  # https://github.com/bcreates440/client-sites-auth
+  base_url: https://client-sites-auth.bcreates440.workers.dev
+  auth_endpoint: auth
+  commit_messages:
+    create: 'Add {{collection}} "{{slug}}"'
+    update: 'Update {{collection}} "{{slug}}"'
+    delete: 'Delete {{collection}} "{{slug}}"'
+    uploadMedia: 'Upload {{path}}'
+    deleteMedia: 'Delete {{path}}'
+
+# Lets the editor run against files on your own computer for testing, using
+# "npx decap-server". Harmless on the live site - it is ignored there.
+local_backend: true
+
+media_folder: "images"
+public_folder: "images"
+
+# TODO: set both of these to the client's real domain once it's pointed here.
+site_url: https://example.com
+display_url: https://example.com
+# Relative, so the sign-in screen shows the logo even before the domain
+# is pointed at this site.
+logo_url: ../images/logo.png
+
+collections:
+
+  # =========================================================================
+  #  PAGES
+  # =========================================================================
+  - name: "pages"
+    label: "Pages"
+    label_singular: "Page"
+    description: >
+      Every page is a stack of sections. Use "Add Sections" at the bottom to
+      add one, drag the handle to reorder, and the rubbish bin to remove one.
+    folder: "_content"
+    extension: "html"
+    format: "yaml-frontmatter"
+    create: true
+    delete: false
+    slug: "{{fields.slug}}"
+    identifier_field: "title"
+    summary: "{{title}}"
+    sortable_fields: ["slug", "title"]
+
+    fields:
+      # ---- identity -------------------------------------------------------
+      - label: "File name"
+        name: "slug"
+        widget: "string"
+        hint: >
+          The short name of the page, with no spaces - index, about, contact.
+          Changing this on an existing page breaks every link to it.
+
+      - label: "Web address"
+        name: "permalink"
+        widget: "string"
+        hint: "Must start with a slash and end in .html - for example /about.html"
+        pattern: ['^/[a-z0-9._-]+\.html$', "Must look like /about.html"]
+
+      # ---- what search engines and Facebook show --------------------------
+      - label: "Browser tab title"
+        name: "title"
+        widget: "string"
+        hint: >
+          Also the blue headline in Google results. Aim for under 60
+          characters and put the most important words first.
+
+      - label: "Search engine description"
+        name: "description"
+        widget: "text"
+        hint: >
+          The grey summary under the headline in Google. Around 150-160
+          characters. Write it for a person, not for a search engine.
+
+      - label: "Facebook headline"
+        name: "og_title"
+        widget: "string"
+        required: false
+        hint: "Shown when the page is shared on Facebook. Leave blank to reuse the tab title."
+      - label: "Facebook description"
+        name: "og_description"
+        widget: "text"
+        required: false
+      - label: "Twitter/X headline"
+        name: "tw_title"
+        widget: "string"
+        required: false
+      - label: "Twitter/X description"
+        name: "tw_description"
+        widget: "text"
+        required: false
+
+      # ---- switches -------------------------------------------------------
+      - label: "Include the machine-readable data for Google"
+        name: "jsonld"
+        widget: "boolean"
+        required: false
+        default: false
+        hint: >
+          Off by default in this template - there's no _includes/jsonld/ yet.
+          Turn on once you've added a matching file there for this page's slug.
+
+      # ---- the page itself ------------------------------------------------
+      - label: "Sections"
+        name: "blocks"
+        label_singular: "Section"
+        widget: "list"
+        collapsed: false
+        types:
+
+          # ------------------------------------------------------ hero -----
+          - label: "Hero banner (home page only)"
+            name: "hero"
+            widget: "object"
+            summary: "Hero - {{fields.heading}}"
+            fields:
+              - { label: "Date badge", name: "badge", widget: "string", required: false }
+              - { label: "Main heading", name: "heading", widget: "string",
+                  hint: "Use <br> where you want the line to break." }
+              - { label: "Sub-heading", name: "subheading", widget: "string", required: false }
+              - { label: "Opening paragraph", name: "intro", widget: "markdown", modes: ["raw"] }
+              - { label: "Show the countdown line", name: "countdown", widget: "boolean", required: false, default: false }
+              - &buttons
+                label: "Buttons"
+                name: "buttons"
+                widget: "list"
+                required: false
+                collapsed: true
+                summary: "{{fields.label}}"
+                fields:
+                  - { label: "Button text", name: "label", widget: "string" }
+                  - { label: "Address", name: "url", widget: "string",
+                      hint: "A page on this site (about.html), a spot on this page (#contact), or a full web address." }
+                  - label: "Style"
+                    name: "style"
+                    widget: "select"
+                    default: "primary"
+                    options: ["primary", "navy", "ghost", "outline"]
+              - { label: "Small note under the buttons", name: "note", widget: "text", required: false }
+
+          # -------------------------------------------------- pagehead -----
+          - label: "Page heading"
+            name: "pagehead"
+            widget: "object"
+            summary: "Page heading - {{fields.heading}}"
+            fields:
+              - &eyebrow
+                label: "Small label above the heading"
+                name: "eyebrow"
+                widget: "string"
+                required: false
+              - { label: "Heading", name: "heading", widget: "string" }
+              - { label: "Opening paragraph", name: "intro", widget: "markdown", modes: ["raw"] }
+              - *buttons
+
+          # ----------------------------------------------------- prose -----
+          - label: "Writing"
+            name: "prose"
+            widget: "object"
+            summary: "Writing - {{fields.heading}}"
+            fields:
+              - &band
+                label: "Background colour"
+                name: "band"
+                widget: "select"
+                required: false
+                default: "paper"
+                options:
+                  - { label: "White", value: "paper" }
+                  - { label: "Cream", value: "cream" }
+                  - { label: "Navy", value: "navy" }
+                  - { label: "Red", value: "red" }
+              - &narrow { label: "Narrow column", name: "narrow", widget: "boolean", required: false, default: true }
+              - &center { label: "Centre the heading", name: "center", widget: "boolean", required: false, default: false }
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string", required: false }
+              - { label: "Stand-first (larger first line)", name: "lede", widget: "text", required: false }
+              - &body
+                label: "Body text"
+                name: "body"
+                widget: "markdown"
+                required: false
+                modes: ["raw"]
+                hint: >
+                  Leave a completely blank line between paragraphs. You can use
+                  the shortcuts [[org]], [[phone]], [[email]] and [[address]] -
+                  they fill themselves in from Site-wide details.
+              - &facts
+                label: "Labelled facts"
+                name: "facts"
+                widget: "list"
+                required: false
+                collapsed: true
+                summary: "{{fields.term}}"
+                fields:
+                  - { label: "Label", name: "term", widget: "string" }
+                  - { label: "Detail", name: "detail", widget: "text" }
+              - label: "Small cards"
+                name: "cards"
+                widget: "list"
+                required: false
+                collapsed: true
+                summary: "{{fields.title}}"
+                fields:
+                  - { label: "Card heading", name: "title", widget: "string" }
+                  - { label: "Card text", name: "body", widget: "markdown", modes: ["raw"] }
+              - { label: "Cards across", name: "cards_columns", widget: "select", required: false, default: "g2", options: ["g2", "g3"] }
+              - &cards_style { label: "Card grid spacing (advanced)", name: "cards_style", widget: "string", required: false }
+              - { label: "Red edge on the cards", name: "cards_accent", widget: "boolean", required: false, default: false }
+              - &callout { label: "Boxed note", name: "callout", widget: "markdown", required: false, modes: ["raw"] }
+              - &callout_style
+                label: "Boxed note style"
+                name: "callout_style"
+                widget: "select"
+                required: false
+                options:
+                  - { label: "Plain box", value: "" }
+                  - { label: "Attention box", value: "alert" }
+              - { label: "Closing paragraph", name: "body_after", widget: "text", required: false }
+              - &after_style { label: "Closing paragraph spacing (advanced)", name: "after_style", widget: "string", required: false }
+              - *buttons
+
+          # ----------------------------------------------------- cards -----
+          - label: "Card grid"
+            name: "cards"
+            widget: "object"
+            summary: "Cards - {{fields.heading}}"
+            fields:
+              - *band
+              - &anchor_id
+                label: "Link anchor (advanced)"
+                name: "id"
+                widget: "string"
+                required: false
+                hint: "Lets a button jump straight here, e.g. #services"
+              - *center
+              - &columns { label: "Cards across", name: "columns", widget: "select", required: false, default: "g3", options: ["g2", "g3"] }
+              - { label: "Red edge on the cards", name: "accent", widget: "boolean", required: false, default: true }
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string", required: false }
+              - label: "Cards"
+                name: "cards"
+                widget: "list"
+                collapsed: true
+                summary: "{{fields.title}}"
+                fields:
+                  - { label: "Card heading", name: "title", widget: "string" }
+                  - { label: "Red edge (overrides the setting above)", name: "accent", widget: "boolean", required: false }
+                  - { label: "Note to future editors", name: "comment", widget: "text", required: false,
+                      hint: "Not shown on the page. It appears only in the page's underlying code." }
+                  - { label: "Photograph", name: "image", widget: "image", required: false, media_library: { config: { multiple: false } } }
+                  - &img_w { label: "Photo width in pixels", name: "image_width", widget: "number", required: false, value_type: "int" }
+                  - &img_h { label: "Photo height in pixels", name: "image_height", widget: "number", required: false, value_type: "int" }
+                  - &img_alt
+                    label: "Photo description"
+                    name: "image_alt"
+                    widget: "string"
+                    required: false
+                    hint: >
+                      Describe what is in the picture. This is what a blind
+                      visitor hears and what Google reads.
+                  - { label: "Card text", name: "body", widget: "markdown", required: false, modes: ["raw"] }
+                  - *facts
+                  - *buttons
+                  - { label: "Small note at the bottom", name: "note", widget: "text", required: false }
+              - *callout
+              - *callout_style
+              - { label: "Centre the buttons", name: "buttons_center", widget: "boolean", required: false, default: false }
+              - &buttons_style { label: "Button row spacing (advanced)", name: "buttons_style", widget: "string", required: false }
+              - *buttons
+
+          # ----------------------------------------------------- split -----
+          - label: "Text beside a photograph"
+            name: "split"
+            widget: "object"
+            summary: "Text + photo - {{fields.heading}}"
+            fields:
+              - *band
+              - *anchor_id
+              - { label: "Photograph on the left", name: "image_first", widget: "boolean", required: false, default: false }
+              - { label: "Nested layout (advanced)", name: "nested", widget: "boolean", required: false, default: false,
+                  hint: "Leave off unless you are copying a section that already had it on." }
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string" }
+              - { label: "Stand-first (larger first line)", name: "lede", widget: "text", required: false }
+              - *body
+              - label: "Ticked list"
+                name: "checks"
+                widget: "list"
+                required: false
+                collapsed: true
+                field: { label: "Point", name: "point", widget: "text" }
+              - { label: "Closing paragraph", name: "body_after", widget: "text", required: false }
+              - *facts
+              - *buttons
+              - { label: "Photograph", name: "image", widget: "image", required: false }
+              - *img_w
+              - *img_h
+              - { label: "Load this photo first (top of page only)", name: "image_priority", widget: "boolean", required: false, default: false }
+              - *img_alt
+
+          # ----------------------------------------------------- table -----
+          - label: "Table"
+            name: "table"
+            widget: "object"
+            summary: "Table - {{fields.heading}}"
+            fields:
+              - *band
+              - *narrow
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string" }
+              - *body
+              - { label: "Table caption", name: "caption", widget: "text",
+                  hint: "A sentence describing the table. Screen readers and Google read this." }
+              - label: "Column headings"
+                name: "columns"
+                widget: "list"
+                field: { label: "Heading", name: "heading", widget: "string" }
+              - label: "Rows"
+                name: "rows"
+                widget: "list"
+                collapsed: false
+                field:
+                  label: "Row"
+                  name: "row"
+                  widget: "string"
+                hint: >
+                  One row per line. Separate the columns with a space, a
+                  vertical bar, and a space:  Standard | $49 | Up to 5 users
+              - *buttons
+              - { label: "Small note under the table", name: "note", widget: "text", required: false }
+
+          # --------------------------------------------------- gallery -----
+          - label: "Photo gallery"
+            name: "gallery"
+            widget: "object"
+            summary: "Gallery - {{fields.heading}}"
+            fields:
+              - *band
+              - *anchor_id
+              - *center
+              - { label: "Gap under the heading (advanced)", name: "heading_gap", widget: "string", required: false }
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string" }
+              - label: "Photographs"
+                name: "photos"
+                widget: "list"
+                collapsed: true
+                summary: "{{fields.caption}}"
+                fields:
+                  - { label: "Photograph", name: "image", widget: "image" }
+                  - { label: "Width in pixels", name: "width", widget: "number", required: false, value_type: "int" }
+                  - { label: "Height in pixels", name: "height", widget: "number", required: false, value_type: "int" }
+                  - label: "Photo description"
+                    name: "alt"
+                    widget: "string"
+                    hint: "Describe what is in the picture."
+                  - { label: "Caption shown under the photo", name: "caption", widget: "string" }
+              - *buttons_style
+              - *buttons
+              - { label: "Credit line at the bottom", name: "note", widget: "text", required: false }
+
+          # ----------------------------------------------------- strip -----
+          - label: "Photo strip"
+            name: "strip"
+            widget: "object"
+            summary: "Photo strip - {{fields.heading}}"
+            fields:
+              - *band
+              - *anchor_id
+              - { label: "Gap under the heading (advanced)", name: "heading_gap", widget: "string", required: false }
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string" }
+              - label: "Photographs"
+                name: "photos"
+                widget: "list"
+                collapsed: true
+                summary: "{{fields.alt}}"
+                fields:
+                  - { label: "Photograph", name: "image", widget: "image" }
+                  - { label: "Width in pixels", name: "width", widget: "number", required: false, value_type: "int" }
+                  - { label: "Height in pixels", name: "height", widget: "number", required: false, value_type: "int" }
+                  - { label: "Photo description", name: "alt", widget: "string" }
+              - *buttons_style
+              - *buttons
+
+          # --------------------------------------------------- carousel ----
+          - label: "Photo carousel"
+            name: "carousel"
+            widget: "object"
+            summary: "Carousel - {{fields.heading}}"
+            fields:
+              - *band
+              - *anchor_id
+              - { label: "Gap under the heading (advanced)", name: "heading_gap", widget: "string", required: false }
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string" }
+              - label: "Photographs"
+                name: "photos"
+                widget: "list"
+                collapsed: true
+                summary: "{{fields.alt}}"
+                fields:
+                  - { label: "Photograph", name: "image", widget: "image" }
+                  - { label: "Width in pixels", name: "width", widget: "number", required: false, value_type: "int" }
+                  - { label: "Height in pixels", name: "height", widget: "number", required: false, value_type: "int" }
+                  - { label: "Photo description", name: "alt", widget: "string" }
+              - *buttons_style
+              - *buttons
+
+          # ---------------------------------------------------- people -----
+          - label: "Team"
+            name: "people"
+            widget: "object"
+            summary: "People - {{fields.heading}}"
+            fields:
+              - *band
+              - *center
+              - { label: "How many across", name: "columns", widget: "number", required: false, value_type: "int" }
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string" }
+              - label: "Which list of people"
+                name: "source"
+                widget: "select"
+                options:
+                  - { label: "Team", value: "team" }
+                hint: >
+                  The names themselves are edited under "Team" in the
+                  sidebar, so they stay the same on every page.
+              - *callout
+              - *callout_style
+
+          # ----------------------------------------------------- stats -----
+          - label: "Big numbers"
+            name: "stats"
+            widget: "object"
+            summary: "Numbers"
+            fields:
+              - *band
+              - label: "Numbers"
+                name: "stats"
+                widget: "list"
+                summary: "{{fields.figure}} - {{fields.label}}"
+                fields:
+                  - { label: "The number", name: "figure", widget: "string" }
+                  - { label: "What it counts", name: "label", widget: "string" }
+
+          # ------------------------------------------------------- cta -----
+          - label: "Closing call to action"
+            name: "cta"
+            widget: "object"
+            summary: "Call to action - {{fields.heading}}"
+            fields:
+              - *band
+              - { label: "Heading", name: "heading", widget: "string" }
+              - { label: "Supporting line", name: "lede", widget: "text", required: false }
+              - *buttons
+
+          # ------------------------------------------------------- raw -----
+          - label: "Custom HTML (advanced)"
+            name: "raw"
+            widget: "object"
+            summary: "Custom HTML"
+            fields:
+              - label: "HTML"
+                name: "html"
+                widget: "text"
+                hint: >
+                  An escape hatch for something the other sections cannot do.
+                  Anything typed here goes onto the page exactly as written.
+
+  # =========================================================================
+  #  THE FACTS THAT APPEAR ON EVERY PAGE
+  # =========================================================================
+  - name: "settings"
+    label: "Site-wide details"
+    files:
+
+      - name: "site"
+        label: "Contact details & links"
+        file: "_data/site.yml"
+        description: >
+          Change something here and it changes everywhere it appears - the
+          footer of every page, and the data Google reads.
+        fields:
+          - { label: "Business / organization name", name: "org_name", widget: "string" }
+          - { label: "One-line description (used in the footer)", name: "org_blurb", widget: "text" }
+          - { label: "Address", name: "address", widget: "string" }
+          - { label: "Email address", name: "email", widget: "string" }
+          - { label: "Phone, as people read it", name: "phone", widget: "string", hint: "For example (307) 555-0100" }
+          - { label: "Phone, as a phone dials it", name: "phone_dial", widget: "string",
+              hint: "Same number, no spaces or brackets, with +1 in front: +13075550100. Change this whenever you change the one above." }
+          - { label: "Facebook page", name: "facebook", widget: "string", required: false }
+          - { label: "Instagram page", name: "instagram", widget: "string", required: false }
+          - { label: "Picture used when a link is shared", name: "share_image", widget: "string" }
+
+      - name: "team"
+        label: "Team"
+        file: "_data/team.yml"
+        description: >
+          Used by the People block. Change a name here once and every page
+          using that block follows.
+        fields:
+          - label: "Team"
+            name: "team"
+            widget: "list"
+            summary: "{{fields.name}} - {{fields.role}}"
+            fields:
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Position", name: "role", widget: "string" }
+              - { label: "Town", name: "town", widget: "string", required: false }
+              - { label: "Phone, as people read it", name: "phone", widget: "string", required: false }
+              - { label: "Phone, as a phone dials it", name: "phone_dial", widget: "string", required: false }
+              - { label: "Email", name: "email", widget: "string", required: false }
+              - { label: "Short note underneath", name: "note", widget: "text", required: false }
+              - { label: "Or one line instead of town and phone", name: "detail", widget: "text", required: false }
+
+      - name: "nav"
+        label: "Navigation menu"
+        file: "_data/nav.yml"
+        description: >
+          The links along the top of every page, and the "Explore" list in the
+          footer. Drag to reorder. A page added here must already exist.
+        fields:
+          - label: "Menu items"
+            name: "items"
+            widget: "list"
+            summary: "{{fields.label}}"
+            fields:
+              - { label: "Page file name", name: "slug", widget: "string", hint: "Must match the page's File name, e.g. about" }
+              - { label: "Address", name: "url", widget: "string", hint: "e.g. about.html" }
+              - { label: "Short name (top menu)", name: "label", widget: "string" }
+              - { label: "Longer name (footer)", name: "footer", widget: "string", required: false }

@@ -1,0 +1,71 @@
+{%- comment -%}
+  A grid of cards. Each card has a small heading and some writing, and may also
+  carry a list of labelled facts, its own buttons, and a quiet note at the end.
+
+  On the section:
+    band      paper, cream, navy or red
+    columns   g2 or g3 - how many across on a wide screen
+    center    true puts the section heading in the middle
+    accent    false removes the red edge from every card
+    callout   a boxed note under the grid
+  On a card:
+    accent    overrides the section setting for this card alone
+    comment   a note to future editors; it appears in the page source only
+{%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'cream' }}"{% if b.id %} id="{{ b.id }}"{% endif %}>
+    <div class="wrap">
+      {%- if b.heading %}
+      {%- if b.center %}
+      <div class="center" style="margin-bottom:2rem">
+        {%- if b.eyebrow %}
+        <p class="eyebrow">{{ b.eyebrow }}</p>
+        {%- endif %}
+        <h2>{{ b.heading }}</h2>
+      </div>
+      {%- else %}
+      {%- if b.eyebrow %}
+      <p class="eyebrow">{{ b.eyebrow }}</p>
+      {%- endif %}
+      <h2>{{ b.heading }}</h2>
+      {%- endif %}
+      {%- endif %}
+      <div class="grid {{ b.columns | default: 'g3' }}">
+        {%- for card in b.cards %}
+        {%- assign acc = b.accent %}{% if card.accent != nil %}{% assign acc = card.accent %}{% endif %}
+        <article class="card{% if card.image %} icard{% elsif acc != false %} card-accent{% endif %}">
+          {%- if card.image %}
+          <img src="{{ card.image }}" {% if card.image_width %}width="{{ card.image_width }}" height="{{ card.image_height }}" {% endif %}loading="lazy"
+               alt="{{ card.image_alt }}">
+          <div class="pad">
+          {%- endif %}
+          <h3>{{ card.title }}</h3>
+          {%- if card.comment %}
+          <!-- {{ card.comment }} -->
+          {%- endif %}
+          {% include md.html text=card.body %}
+          {%- if card.facts %}
+          <ul class="facts">
+            {%- for f in card.facts %}
+            <li><b>{{ f.term }}</b><span>{% include md.html text=f.detail inline=true %}</span></li>
+            {%- endfor %}
+          </ul>
+          {%- endif %}
+          {%- include blocks/buttons.html buttons=card.buttons %}
+          {%- if card.note %}
+          <p class="btn-note">{% include md.html text=card.note inline=true %}</p>
+          {%- endif %}
+          {%- if card.image %}
+          </div>
+          {%- endif %}
+        </article>
+        {%- endfor %}
+      </div>
+      {%- if b.callout %}
+      <div class="note{% if b.callout_style %} {{ b.callout_style }}{% endif %}" style="margin-top:2rem">
+        {% include md.html text=b.callout %}
+      </div>
+      {%- endif %}
+      {%- include blocks/buttons.html buttons=b.buttons center=b.buttons_center style=b.buttons_style %}
+    </div>
+  </section>

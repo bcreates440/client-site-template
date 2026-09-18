@@ -1,0 +1,50 @@
+{%- comment -%}
+  The footer. Written once, used by every page.
+  The name, address and phone here must stay identical across the whole site -
+  search engines use that consistency to rank local results. Because this is
+  now one file, they cannot drift apart.
+{%- endcomment -%}
+{%- assign s = site.data.site -%}
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="fbrand">
+        <img src="images/logo.png" alt="{{ s.org_name }} logo"
+             width="74" height="74" loading="lazy">
+        <p><strong style="color:#fff">{{ s.org_name }}</strong><br>
+        {{ s.org_blurb }}</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <ul>
+{%- for item in site.data.nav.items %}
+          <li><a href="{{ item.url }}">{{ item.footer | default: item.label }}</a></li>
+{%- endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3>Connect</h3>
+        <ul>
+{%- if s.facebook %}
+          <li><a href="{{ s.facebook }}" target="_blank" rel="noopener">Facebook</a></li>
+{%- endif %}
+{%- if s.instagram %}
+          <li><a href="{{ s.instagram }}" target="_blank" rel="noopener">Instagram</a></li>
+{%- endif %}
+        </ul>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <p>
+          {{ s.org_name }}<br>
+          {{ s.address }}<br>
+          <a href="mailto:{{ s.email }}">{{ s.email }}</a><br>
+          <a href="tel:{{ s.phone_dial }}">{{ s.phone }}</a>
+        </p>
+      </div>
+    </div>
+    <div class="legal">
+      <span>&copy; {{ site.time | date: '%Y' }} {{ s.org_name }}. All rights reserved.</span>
+    </div>
+  </div>
+</footer>

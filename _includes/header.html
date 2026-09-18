@@ -1,0 +1,27 @@
+{%- comment -%}
+  The logo bar and main navigation. Written once, used by every page.
+  The links come from _data/nav.yml. The red underline on the current page is
+  handled automatically by comparing each link's slug to the page's own slug.
+{%- endcomment -%}
+{%- assign s = site.data.site -%}
+<a class="skip" href="#main">Skip to main content</a>
+<header class="site-header">
+  <div class="hbar">
+    <a class="brand" href="index.html">
+      <img src="images/logo.png" alt="{{ s.org_name }} logo"
+           width="52" height="52">
+      <span class="brandtext">
+        <b>{{ s.org_name }}</b>
+      </span>
+    </a>
+    <input class="nav-toggle" type="checkbox" id="navtoggle" aria-label="Open menu">
+    <label class="nav-label" for="navtoggle" aria-hidden="true">&#9776;</label>
+    <nav class="nav" aria-label="Main">
+      <ul>
+{%- for item in site.data.nav.items %}
+        <li><a href="{{ item.url }}"{% if item.slug == page.slug %} aria-current="page"{% endif %}>{{ item.label }}</a></li>
+{%- endfor %}
+      </ul>
+    </nav>
+  </div>
+</header>

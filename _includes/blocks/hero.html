@@ -1,0 +1,23 @@
+{%- comment -%}
+  The big banner at the top of the home page, over the mountain photograph.
+  countdown: true leaves room for the "days until the doors open" line, which
+  is filled in by the small script at the bottom of the page.
+{%- endcomment -%}
+{%- assign b = include.b -%}
+  <div class="hero">
+    <div class="wrap">
+      <p class="datebadge">{% include md.html text=b.badge inline=true %}</p>
+      <h1>{% include md.html text=b.heading inline=true %}</h1>
+      {%- if b.subheading %}
+      <p class="hero-sub">{% include md.html text=b.subheading inline=true %}</p>
+      {%- endif %}
+      {% include md.html text=b.intro %}
+      {%- if b.countdown %}
+      <p id="countdown" class="hero-sub" style="margin:1.4rem 0 .4rem"></p>
+      {%- endif %}
+      {%- include blocks/buttons.html buttons=b.buttons center=true %}
+      {%- if b.note %}
+      <p class="btn-note">{% include md.html text=b.note inline=true %}</p>
+      {%- endif %}
+    </div>
+  </div>

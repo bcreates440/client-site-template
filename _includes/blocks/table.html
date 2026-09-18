@@ -1,0 +1,29 @@
+{%- comment -%} A table, with a caption screen-readers and search engines use. {%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'paper' }}">
+    <div class="wrap{% if b.narrow != false %} narrow{% endif %}">
+      {%- if b.eyebrow %}
+      <p class="eyebrow">{{ b.eyebrow }}</p>
+      {%- endif %}
+      <h2>{{ b.heading }}</h2>
+      {% include md.html text=b.body %}
+      <div class="tablewrap">
+        <table>
+          <caption>{{ b.caption }}</caption>
+          <thead><tr>
+            {%- for col in b.columns %}<th scope="col">{{ col }}</th>{% endfor %}
+          </tr></thead>
+          <tbody>
+            {%- for row in b.rows %}
+            {%- assign cells = row | split: ' | ' %}
+            <tr>{% for cell in cells %}<td>{% include md.html text=cell inline=true %}</td>{% endfor %}</tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      {%- include blocks/buttons.html buttons=b.buttons style="margin-top:1.6rem" %}
+      {%- if b.note %}
+      <p class="btn-note">{%- include md.html text=b.note inline=true %}</p>
+      {%- endif %}
+    </div>
+  </section>

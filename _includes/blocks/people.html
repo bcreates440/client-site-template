@@ -1,0 +1,46 @@
+{%- comment -%}
+  A list of people (team, officers, board - whatever the client calls it).
+  Set "source" to a top-level key in _data/team.yml to pull from there, or
+  leave it blank and list people right on this block with "people".
+{%- endcomment -%}
+{%- assign b = include.b -%}
+{%- if b.source %}{% assign folk = site.data.team[b.source] %}{% else %}{% assign folk = b.people %}{% endif -%}
+  <section class="band-{{ b.band | default: 'paper' }}">
+    <div class="wrap">
+      {%- if b.center %}
+      <div class="center" style="margin-bottom:2rem">
+        {%- if b.eyebrow %}
+        <p class="eyebrow">{{ b.eyebrow }}</p>
+        {%- endif %}
+        <h2>{{ b.heading }}</h2>
+      </div>
+      {%- else %}
+      {%- if b.eyebrow %}
+      <p class="eyebrow">{{ b.eyebrow }}</p>
+      {%- endif %}
+      <h2>{{ b.heading }}</h2>
+      {%- endif %}
+      <ul class="people"{% if b.columns %} style="grid-template-columns:repeat({{ b.columns }},1fr)"{% endif %}>
+        {%- for p in folk %}
+        <li class="person">
+          <b>{{ p.name }}</b>
+          <span class="role">{{ p.role }}</span>
+          {%- if p.detail %}
+          <p>{{ p.detail }}</p>
+          {%- else %}
+          <p>{{ p.town }}<br><a href="tel:{{ p.phone_dial }}">{{ p.phone }}</a>{% if p.email %}<br>
+             <a href="mailto:{{ p.email }}">{{ p.email }}</a>{% endif %}</p>
+          {%- endif %}
+          {%- if p.note %}
+          <p class="btn-note">{{ p.note }}</p>
+          {%- endif %}
+        </li>
+        {%- endfor %}
+      </ul>
+      {%- if b.callout %}
+      <div class="note{% if b.callout_style %} {{ b.callout_style }}{% endif %}" style="margin-top:2rem">
+        {% include md.html text=b.callout %}
+      </div>
+      {%- endif %}
+    </div>
+  </section>

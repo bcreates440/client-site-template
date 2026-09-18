@@ -1,0 +1,270 @@
+/* ===========================================================================
+   SITE STYLES - starter template
+   The whole site's appearance lives in this one file. Change it here and every
+   page changes together - there are no other stylesheets and no page-specific
+   overrides.
+
+   Nearly everything you would want to change is in the :root block below:
+   the brand colours, the fonts and the page width. This starting palette is
+   just a placeholder - swap the --navy/--red/--gold values for the client's
+   own brand.
+   =========================================================================== */
+:root{
+  /* ---- BRAND COLORS (taken from the WWCA seal) ---- */
+  --navy:#14264F; --navy-2:#1B2A56; --navy-deep:#0D1B3A;
+  --red:#C8202E; --red-dark:#9E1824;
+  --cream:#F7F5F0; --paper:#FFFFFF;
+  --ink:#1A1A1C; --ink-soft:#4A4E58; --line:#DFDAD0;
+  --gold:#C8A24A;
+  /* ---- TYPE ---- */
+  --font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --display:"Arial Black","Segoe UI",system-ui,Impact,sans-serif;
+  /* ---- SPACING / SHAPE ---- */
+  --wrap:1180px; --gutter:20px; --radius:10px;
+  --shadow:0 2px 10px rgba(13,27,58,.08);
+  --shadow-lg:0 12px 32px rgba(13,27,58,.16);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--font);font-size:17px;line-height:1.65;
+  color:var(--ink);background:var(--cream)}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--red);text-decoration-thickness:.08em;text-underline-offset:.18em}
+a:hover{color:var(--red-dark)}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.12;margin:0 0 .5em}
+h1{font-size:clamp(2rem,5.2vw,3.5rem);text-transform:uppercase}
+h2{font-size:clamp(1.5rem,3.4vw,2.35rem);text-transform:uppercase}
+h3{font-size:1.2rem}
+p{margin:0 0 1.1em}
+hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
+.wrap{max-width:var(--wrap);margin:0 auto;padding-inline:var(--gutter)}
+.narrow{max-width:820px}
+.center{text-align:center}
+.eyebrow{font-family:var(--display);text-transform:uppercase;letter-spacing:.14em;
+  font-size:.78rem;color:var(--red);margin:0 0 .6rem}
+.lede{font-size:1.15rem;color:var(--ink-soft)}
+.skip{position:absolute;left:-9999px;top:0;background:var(--red);color:#fff;
+  padding:.7rem 1rem;z-index:200}
+.skip:focus{left:0}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* ---------- BUTTONS ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  min-height:48px;padding:.8rem 1.5rem;border-radius:var(--radius);
+  font-family:var(--display);font-size:.95rem;text-transform:uppercase;letter-spacing:.04em;
+  text-decoration:none;border:2px solid transparent;cursor:pointer;
+  transition:transform .12s ease,background .12s ease,box-shadow .12s ease}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.btn-primary{background:var(--red);color:#fff}
+.btn-primary:hover{background:var(--red-dark);color:#fff}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy-2);color:#fff}
+.btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+.btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff}
+.btn-outline{background:transparent;color:var(--navy);border-color:var(--navy)}
+.btn-outline:hover{background:var(--navy);color:#fff}
+.btn-row{display:flex;flex-wrap:wrap;gap:.8rem}
+.btn-row.center{justify-content:center}
+.btn-note{font-size:.9rem;color:var(--ink-soft);margin:.8rem 0 0}
+.band-navy .btn-note,.hero .btn-note{color:#AEBBD8}
+
+/* ---------- HEADER / NAV ---------- */
+.site-header{position:sticky;top:0;z-index:100;background:var(--navy);
+  border-bottom:3px solid var(--red)}
+.hbar{display:flex;align-items:center;gap:1rem;
+  max-width:var(--wrap);margin:0 auto;padding:.6rem var(--gutter)}
+.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;color:#fff;
+  margin-right:auto}
+.brand img{width:52px;height:52px;flex:none}
+.brand b{display:block;font-family:var(--display);font-size:1.02rem;
+  text-transform:uppercase;line-height:1.1}
+.brand span{display:block;font-size:.72rem;letter-spacing:.11em;text-transform:uppercase;
+  color:#AEBBD8}
+.nav-toggle{position:absolute;opacity:0;width:1px;height:1px}
+.nav-label{display:none;color:#fff;font-size:1.6rem;line-height:1;cursor:pointer;
+  padding:.4rem .7rem;border:1px solid rgba(255,255,255,.35);border-radius:8px;
+  min-height:44px;align-items:center}
+.nav-toggle:focus-visible + .nav-label{outline:3px solid var(--gold);outline-offset:2px}
+.nav a{color:#E6EAF4;text-decoration:none;font-size:.93rem;padding:.55rem .6rem;
+  border-radius:6px;display:block}
+.nav a:hover{background:rgba(255,255,255,.12);color:#fff}
+.nav a[aria-current="page"]{color:#fff;box-shadow:inset 0 -3px 0 var(--red)}
+.nav ul{display:flex;align-items:center;gap:.15rem;list-style:none;margin:0;padding:0}
+.nav .btn{margin-left:.5rem;min-height:42px;padding:.55rem 1rem;font-size:.82rem}
+
+/* ---------- HERO ---------- */
+/* The ../ is required: paths in a stylesheet resolve from the stylesheet
+   itself, not from the page. This file lives in css/, so the images folder
+   is one level up. Moving this file means fixing this line. */
+.hero{position:relative;background:var(--navy-deep); /* add url("../images/hero.jpg") center/cover no-repeat once there's a real photo */
+  color:#fff;text-align:center}
+.hero::before{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(9,18,40,.62),rgba(9,18,40,.82))}
+.hero .wrap{position:relative;padding-block:clamp(3rem,9vw,6.5rem)}
+.hero h1{text-shadow:0 2px 18px rgba(0,0,0,.45);margin-bottom:.35em}
+.hero p{color:#DCE3F2;max-width:660px;margin-inline:auto}
+.datebadge{display:inline-block;background:var(--red);color:#fff;font-family:var(--display);
+  text-transform:uppercase;letter-spacing:.09em;font-size:clamp(.95rem,2.2vw,1.2rem);
+  padding:.55rem 1.3rem;border-radius:999px;margin-bottom:1.1rem}
+.hero-sub{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;
+  font-size:clamp(1rem,2.4vw,1.35rem);color:#fff;margin-bottom:1.6rem}
+.pagehead{background:var(--navy);color:#fff;text-align:center}
+.pagehead .wrap{padding-block:clamp(2.2rem,5vw,3.4rem)}
+.pagehead p{color:#C7D1E8;max-width:700px;margin-inline:auto}
+.pagehead .eyebrow{color:#F2A6AD}
+
+/* ---------- SECTIONS ---------- */
+section{padding-block:clamp(2.6rem,6vw,4.4rem)}
+.band-paper{background:var(--paper)}
+.band-cream{background:var(--cream)}
+.band-navy{background:var(--navy);color:#fff}
+.band-navy h2,.band-navy h3{color:#fff}
+.band-navy p{color:#C7D1E8}
+.band-navy .eyebrow{color:#F2A6AD}
+/* Light surfaces sitting inside a navy band keep dark text, or they become
+   pale-on-white and unreadable. Add any new light-on-dark block to this list. */
+.band-navy .card p,.band-navy .card li,.band-navy .card span,
+.band-navy .person p,.band-navy .person span,
+.band-navy .note,.band-navy .note p,.band-navy .note li{color:var(--ink)}
+.band-navy .card .facts b,.band-navy .note .facts b{color:var(--navy)}
+.band-navy .card .facts li{border-color:var(--line)}
+.band-navy .card .role,.band-navy .person .role{color:var(--red)}
+.band-navy .card .btn-note,.band-navy .person .btn-note{color:var(--ink-soft)}
+/* Brand red on navy fails contrast, so links directly on a navy background go
+   pale pink. Links inside a white card on that band stay red. */
+.band-navy a:not(.btn),.pagehead a:not(.btn),.hero a:not(.btn){color:#FFC9CE}
+.band-navy a:not(.btn):hover,.pagehead a:not(.btn):hover,.hero a:not(.btn):hover{color:#fff}
+.band-navy .card a:not(.btn),.band-navy .note a:not(.btn),
+.band-navy .person a:not(.btn){color:var(--red)}
+.band-navy .card a:not(.btn):hover,.band-navy .note a:not(.btn):hover,
+.band-navy .person a:not(.btn):hover{color:var(--red-dark)}
+.band-red{background:var(--red);color:#fff}
+.band-red h2{color:#fff}
+.band-red p{color:#FFE2E4}
+
+/* ---------- GRID + CARDS ---------- */
+.grid{display:grid;gap:1.4rem}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.5rem;box-shadow:var(--shadow)}
+.card h3{color:var(--navy);margin-bottom:.4rem}
+.card p:last-child{margin-bottom:0}
+.card-accent{border-top:5px solid var(--red)}
+.icard{padding:0;overflow:hidden}
+.icard img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.icard .pad{padding:1.25rem}
+.split{display:grid;grid-template-columns:1.05fr .95fr;gap:2.4rem;align-items:center}
+.split img{border-radius:var(--radius);box-shadow:var(--shadow-lg)}
+
+/* ---------- FACT LISTS / TABLES ---------- */
+.facts{list-style:none;margin:0;padding:0}
+.facts li{display:flex;flex-wrap:wrap;gap:.3rem 1rem;padding:.75rem 0;
+  border-bottom:1px solid var(--line)}
+.facts li:last-child{border-bottom:0}
+.facts b{font-family:var(--display);text-transform:uppercase;letter-spacing:.05em;
+  font-size:.82rem;color:var(--navy);min-width:150px;flex:none;padding-top:.15rem}
+.band-navy .facts li{border-color:rgba(255,255,255,.18)}
+.band-navy .facts b{color:#fff}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:460px;background:var(--paper)}
+caption{text-align:left;font-size:.9rem;color:var(--ink-soft);padding-bottom:.6rem}
+th,td{padding:.85rem 1rem;border-bottom:1px solid var(--line);text-align:left}
+th{background:var(--navy);color:#fff;font-family:var(--display);font-size:.82rem;
+  text-transform:uppercase;letter-spacing:.06em}
+tbody tr:nth-child(even){background:#FBFAF7}
+
+/* ---------- STATS ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;text-align:center}
+.stat b{display:block;font-family:var(--display);font-size:clamp(1.9rem,4.6vw,2.9rem);
+  color:var(--red);line-height:1}
+.band-navy .stat b{color:#fff}
+.stat span{display:block;font-size:.88rem;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-soft);margin-top:.35rem}
+.band-navy .stat span{color:#AEBBD8}
+
+/* ---------- CALLOUTS ---------- */
+.note{border-left:5px solid var(--red);background:#FFF6F1;padding:1.1rem 1.3rem;
+  border-radius:0 var(--radius) var(--radius) 0;margin:1.6rem 0;color:var(--ink)}
+.note p:last-child{margin-bottom:0}
+.note strong{color:var(--red-dark)}
+.alert{border-left-color:var(--gold);background:#FFFAEC}
+.checks{list-style:none;margin:0 0 1.1em;padding:0}
+.checks li{padding:.42rem 0 .42rem 1.8rem;position:relative}
+.checks li::before{content:"\2713";position:absolute;left:0;top:.42rem;
+  color:var(--red);font-weight:700}
+.band-navy .checks li::before{color:#F2A6AD}
+
+/* ---------- PEOPLE ---------- */
+.people{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;list-style:none;
+  margin:0;padding:0}
+.person{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1.2rem}
+.person b{display:block;font-size:1.05rem;color:var(--navy)}
+.person .role{display:block;font-family:var(--display);text-transform:uppercase;
+  font-size:.74rem;letter-spacing:.09em;color:var(--red);margin:.15rem 0 .5rem}
+.person a{word-break:break-word}
+
+/* ---------- GALLERY ---------- */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.gallery figure{margin:0;background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.gallery img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.gallery figcaption{padding:.8rem 1rem;font-size:.9rem;color:var(--ink-soft)}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.strip img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:var(--radius)}
+.carousel{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding-bottom:.6rem;-webkit-overflow-scrolling:touch}
+.carousel img{flex:0 0 auto;width:min(78vw,340px);aspect-ratio:4/3;object-fit:cover;
+  border-radius:var(--radius);scroll-snap-align:center}
+
+/* ---------- FOOTER ---------- */
+.site-footer{background:var(--navy);color:#C7D1E8;padding-block:3rem 1.5rem;font-size:.95rem}
+.site-footer h3{color:#fff;font-size:.86rem;text-transform:uppercase;letter-spacing:.11em;
+  margin-bottom:.9rem}
+.site-footer a{color:#E6EAF4;text-decoration:none}
+.site-footer a:hover{color:#fff;text-decoration:underline}
+.fgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:2rem}
+.fgrid ul{list-style:none;margin:0;padding:0}
+.fgrid li{margin-bottom:.45rem}
+.fbrand img{width:74px;height:74px;margin-bottom:.8rem}
+.legal{border-top:1px solid rgba(255,255,255,.16);margin-top:2.2rem;padding-top:1.3rem;
+  display:flex;flex-wrap:wrap;gap:.6rem 1.5rem;justify-content:space-between;
+  font-size:.86rem;color:#8FA0C4}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:980px){
+  .g4,.stats,.people{grid-template-columns:repeat(2,1fr)}
+  .fgrid{grid-template-columns:repeat(2,1fr)}
+  .split{grid-template-columns:1fr;gap:1.6rem}
+  .gallery,.strip{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:820px){
+  /* keep the logo + wordmark + burger on one row */
+  .brand img{width:42px;height:42px}
+  .brand b{font-size:.84rem}
+  .brand span{font-size:.6rem;letter-spacing:.08em}
+  .nav-label{display:inline-flex}
+  .nav{display:none;width:100%;padding-bottom:.8rem}
+  .nav ul{flex-direction:column;align-items:stretch;gap:.1rem}
+  .nav .btn{margin:.5rem 0 0;width:100%}
+  .nav-toggle:checked ~ .nav{display:block}
+  .hbar{flex-wrap:wrap}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  .g2,.g3,.g4,.stats,.people,.gallery{grid-template-columns:1fr}
+  .strip{grid-template-columns:repeat(2,1fr)}
+  .fgrid{grid-template-columns:1fr}
+  .facts b{min-width:100%}
+  .btn-row{flex-direction:column}
+  .btn-row .btn{width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+@media print{
+  .site-header,.site-footer,.btn,.nav{display:none!important}
+  body{background:#fff;font-size:12pt}
+}
