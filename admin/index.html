@@ -1,0 +1,44 @@
+---
+permalink: /admin/index.html
+sitemap: false
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Edit this website</title>
+<link rel="icon" href="../images/logo.png" type="image/png">
+<style>
+  /* Shown only for the second or two before the editor loads. */
+  body{margin:0;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;
+       color:#14264F;background:#F7F5F0}
+  .boot{max-width:30rem;margin:18vh auto;padding:0 1.25rem;text-align:center}
+  .boot img{width:72px;height:72px}
+  .boot h1{font-size:1.25rem;margin:1rem 0 .25rem}
+  .boot p{color:#4A4E58;margin:0}
+</style>
+</head>
+<body>
+
+<div class="boot" id="boot">
+  <img src="../images/logo.png" alt="" width="72" height="72">
+  <h1>Opening the website editor</h1>
+  <p>One moment. If this message stays on screen, the editor could not start &mdash;
+     check your internet connection and reload the page.</p>
+</div>
+
+<script src="https://unpkg.com/decap-cms@^3.8.4/dist/decap-cms.js"></script>
+<script>
+  // Hide the holding message once the editor has taken over the page.
+  window.addEventListener("load", function () {
+    setTimeout(function () {
+      var boot = document.getElementById("boot");
+      if (boot && document.querySelector("#nc-root, .css-nc-root")) boot.remove();
+    }, 1500);
+  });
+</script>
+
+</body>
+</html>
