@@ -59,6 +59,27 @@ replace.
   template doesn't have yet — add them the same way the original site did:
   new `_includes/blocks/*.html` + a matching entry in `admin/config.yml`.
 
+## Changing the typography
+
+`--display` (headings + wordmark) and `--ui` (buttons, eyebrows, table
+headers) are separate tokens on purpose: keep `--ui` a sans even when
+`--display` is a serif, because uppercase serif at label size reads dated.
+`--display-case` switches headings between `uppercase` and sentence case, and
+`--display-weight` compensates when a lighter face replaces the heavy default.
+
+To self-host a heading font (no third-party request, client owns the file):
+
+1. Put the `.woff2` in `fonts/` along with its licence (use an OFL face).
+2. Add an `@font-face` above `:root` in `css/styles.css`, with
+   `font-display:swap`. The `src:` path is `../fonts/...` — stylesheet paths
+   resolve from the stylesheet, not the page.
+3. Preload it in `_includes/head.html`, before the stylesheet link:
+   `<link rel="preload" href="fonts/NAME.woff2" as="font" type="font/woff2" crossorigin>`
+   (`crossorigin` is required even same-origin, or the font downloads twice.)
+4. Point `--display` at it, with real fallbacks after it.
+
+`bcreates440/jones-uncommon-site` is a worked example of all four steps.
+
 ## Local preview
 
 ```
