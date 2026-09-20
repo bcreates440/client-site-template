@@ -6,7 +6,9 @@
 {%- assign b = include.b -%}
   <div class="hero">
     <div class="wrap">
+      {%- if b.badge %}
       <p class="datebadge">{% include md.html text=b.badge inline=true %}</p>
+      {%- endif %}
       <h1>{% include md.html text=b.heading inline=true %}</h1>
       {%- if b.subheading %}
       <p class="hero-sub">{% include md.html text=b.subheading inline=true %}</p>
