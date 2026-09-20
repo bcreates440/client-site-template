@@ -132,6 +132,43 @@ else
   puts "note: no _site folder - run 'bundle exec jekyll build' first to check the built pages"
 end
 
+# --- 4. no hardcoded colours outside the token block ----------------------
+#  A colour written anywhere except :root is a colour that will NOT follow the
+#  brand when this site is rebranded. That is how a site ends up with stray
+#  navy text on a green palette. This check keeps the "change the tokens,
+#  rebrand the site" promise honest.
+#
+#  _data/*.yml is deliberately NOT scanned: theme_color lives there on purpose,
+#  because a <meta> tag cannot read a CSS variable.
+HEX = /(?<![\w&])#(?:\h{3}|\h{6}|\h{8})\b/
+
+def neutral_rgb?(fn)
+  nums = fn.scan(/\d+/).first(3).map(&:to_i)
+  return false if nums.size < 3
+  nums.all?(&:zero?) || nums.all? { |n| n == 255 }
+end
+
+if File.exist?("css/styles.css")
+  css  = File.read("css/styles.css", encoding: "utf-8")
+  root = css[/:root\s*\{.*?\n\}/m].to_s
+  rest = css.sub(root, "")
+  strays = rest.scan(HEX).uniq
+  rgbs   = rest.scan(/rgba?\([^)]*\)/).reject { |r| r.include?("var(") || neutral_rgb?(r) }.uniq
+  strays.each { |c| bad "hardcoded colour #{c} in css/styles.css outside :root - add a token in :root and use var()" }
+  rgbs.each   { |r| bad "hardcoded colour #{r} in css/styles.css outside :root - add a token in :root and use var()" }
+  ok "css/styles.css: every colour comes from a :root token" if strays.empty? && rgbs.empty?
+end
+
+tmpl_bad = 0
+(Dir["_includes/**/*.html"] + Dir["_layouts/*.html"] + Dir["_content/*.html"]).sort.each do |f|
+  File.read(f, encoding: "utf-8").scan(HEX).uniq.each do |c|
+    tmpl_bad += 1
+    bad "hardcoded colour #{c} in #{f} - use a class in css/styles.css instead of an inline style"
+  end
+end
+ok "no hardcoded colours in templates or page content" if tmpl_bad.zero?
+
+
 puts ""
 puts $fail.zero? ? "ALL CHECKS PASSED" : "#{$fail} problem(s) found"
 exit($fail.zero? ? 0 : 1)

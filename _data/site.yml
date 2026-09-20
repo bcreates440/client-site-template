@@ -24,5 +24,10 @@ phone_dial:   "+13075550100"
 facebook:     ""
 instagram:    ""
 
+# The colour a mobile browser tints its own chrome with. Keep it the same as
+# --brand in css/styles.css. (It cannot read the CSS token, so it is the one
+# colour that has to be stated twice - change both together.)
+theme_color:  "#14264F"
+
 # --- the picture used when a link is shared on Facebook etc. ----------------
 share_image:  "images/logo.png"

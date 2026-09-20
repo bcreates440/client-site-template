@@ -16,7 +16,9 @@ replace.
    - `site_url` / `display_url`: the client's real domain (or the
      `github.io` URL for now)
 3. Edit `_config.yml`: set `url`, `title`, `description`.
-4. Edit `_data/site.yml`: the real org name, contact info, socials.
+4. Edit `_data/site.yml`: the real org name, contact info, socials, and
+   `theme_color` (match it to `--brand` — a `<meta>` tag can't read a CSS
+   variable, so it's the one colour stated twice).
 5. Edit `_data/nav.yml` and add pages under `_content/` as needed — copy
    `_content/index.html` as a starting pattern, keep `slug`/`permalink`
    matching the file name.

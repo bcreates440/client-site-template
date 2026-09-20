@@ -513,6 +513,8 @@ collections:
               hint: "Same number, no spaces or brackets, with +1 in front: +13075550100. Change this whenever you change the one above." }
           - { label: "Facebook page", name: "facebook", widget: "string", required: false }
           - { label: "Instagram page", name: "instagram", widget: "string", required: false }
+          - { label: "Browser theme colour", name: "theme_color", widget: "string",
+              hint: "The colour a phone tints its browser bar with. Match it to --brand in css/styles.css." }
           - { label: "Picture used when a link is shared", name: "share_image", widget: "string" }
 
       - name: "team"
