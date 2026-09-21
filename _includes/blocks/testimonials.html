@@ -1,0 +1,38 @@
+{%- comment -%}
+  Reviews with attribution. Optional star rating, drawn as text characters so
+  no icon or image is needed. Use "columns" g2 or g3.
+{%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'cream' }}">
+    <div class="wrap">
+      {%- if b.heading %}
+      {%- if b.center %}
+      <div class="center" style="margin-bottom:2rem">
+        {%- if b.eyebrow %}
+        <p class="eyebrow">{{ b.eyebrow }}</p>
+        {%- endif %}
+        <h2>{{ b.heading }}</h2>
+      </div>
+      {%- else %}
+      {%- if b.eyebrow %}
+      <p class="eyebrow">{{ b.eyebrow }}</p>
+      {%- endif %}
+      <h2>{{ b.heading }}</h2>
+      {%- endif %}
+      {%- endif %}
+      <div class="grid {{ b.columns | default: 'g3' }}">
+        {%- for rev in b.items %}
+        <figure class="card testimonial">
+          {%- if rev.rating %}
+          <p class="stars" aria-label="{{ rev.rating }} out of 5 stars">
+            {%- for i in (1..5) %}{% if i <= rev.rating %}★{% else %}☆{% endif %}{% endfor -%}
+          </p>
+          {%- endif %}
+          <blockquote>{% include md.html text=rev.quote inline=true %}</blockquote>
+          <figcaption><b>{{ rev.name }}</b>{% if rev.detail %}<span>{{ rev.detail }}</span>{% endif %}</figcaption>
+        </figure>
+        {%- endfor %}
+      </div>
+      {%- include blocks/buttons.html buttons=b.buttons center=true style="margin-top:1.6rem" %}
+    </div>
+  </section>

@@ -1,0 +1,24 @@
+{%- comment -%}
+  Questions and answers as native <details>/<summary>. Zero JS, keyboard
+  accessible, and search engines read it.
+{%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'paper' }}">
+    <div class="wrap{% if b.narrow != false %} narrow{% endif %}">
+      {%- if b.eyebrow %}
+      <p class="eyebrow">{{ b.eyebrow }}</p>
+      {%- endif %}
+      {%- if b.heading %}
+      <h2>{{ b.heading }}</h2>
+      {%- endif %}
+      <div class="faq">
+        {%- for item in b.items %}
+        <details>
+          <summary>{{ item.q }}</summary>
+          <div>{% include md.html text=item.a %}</div>
+        </details>
+        {%- endfor %}
+      </div>
+      {%- include blocks/buttons.html buttons=b.buttons style="margin-top:1.6rem" %}
+    </div>
+  </section>

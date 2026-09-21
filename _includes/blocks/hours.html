@@ -1,0 +1,21 @@
+{%- comment -%}
+  Opening hours as day/time rows - lighter markup than a full <table> for
+  seven lines.
+{%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'paper' }}">
+    <div class="wrap{% if b.narrow != false %} narrow{% endif %}">
+      {%- if b.heading %}
+      <h2>{{ b.heading }}</h2>
+      {%- endif %}
+      <ul class="hours">
+        {%- for row in b.rows %}
+        <li><span>{{ row.day }}</span><span>{{ row.time }}</span></li>
+        {%- endfor %}
+      </ul>
+      {%- if b.note %}
+      <p class="btn-note">{% include md.html text=b.note inline=true %}</p>
+      {%- endif %}
+      {%- include blocks/buttons.html buttons=b.buttons style="margin-top:1.6rem" %}
+    </div>
+  </section>

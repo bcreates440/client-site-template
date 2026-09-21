@@ -39,6 +39,9 @@
                alt="{{ card.image_alt }}">
           <div class="pad">
           {%- endif %}
+          {%- if card.icon %}
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-{{ card.icon }}"></use></svg>
+          {%- endif %}
           <h3>{{ card.title }}</h3>
           {%- if card.comment %}
           <!-- {{ card.comment }} -->

@@ -4,7 +4,7 @@
 {%- endcomment -%}
 {%- assign b = include.b -%}
   <section class="band-{{ b.band | default: 'paper' }}">
-    <div class="wrap{% if b.narrow != false %} narrow{% endif %}{% if b.center %} center{% endif %}">
+    <div class="wrap{% if b.narrow != false %} narrow{% endif %}{% if b.center %} center{% endif %}{% if b.feature %} feature{% endif %}">
       {%- if b.eyebrow %}
       <p class="eyebrow">{{ b.eyebrow }}</p>
       {%- endif %}

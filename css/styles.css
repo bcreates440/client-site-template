@@ -185,6 +185,20 @@ section{padding-block:clamp(2.6rem,6vw,4.4rem)}
 .band-red h2{color:var(--on-dark)}
 .band-red p{color:var(--on-accent-soft)}
 
+/* ---------- ICONS ---------- */
+/* Drawn as strokes with no fill, so the colour comes from here and follows a
+   rebrand. See _includes/icons.html for the shapes. */
+.icon{display:block;width:2.1rem;height:2.1rem;margin-bottom:.9rem;
+  fill:none;stroke:var(--accent);stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round}
+.center .icon{margin-inline:auto}
+.band-navy .icon,.hero .icon{stroke:var(--accent-pale)}
+/* ...but an icon inside a white card on that band is back on a light
+   surface, so it takes the normal accent again. Same trap as the text
+   colours above. */
+.band-navy .card .icon{stroke:var(--accent)}
+.icon-lg{width:3.2rem;height:3.2rem}
+
 /* ---------- GRID + CARDS ---------- */
 .grid{display:grid;gap:1.4rem}
 .g2{grid-template-columns:repeat(2,1fr)}
@@ -200,6 +214,18 @@ section{padding-block:clamp(2.6rem,6vw,4.4rem)}
 .icard .pad{padding:1.25rem}
 .split{display:grid;grid-template-columns:1.05fr .95fr;gap:2.4rem;align-items:center}
 .split img{border-radius:var(--radius);box-shadow:var(--shadow-lg)}
+
+/* ---------- FEATURE PROSE (an About with no photograph) ----------
+   A wide measure of plain text looks unfinished. This gives the section a
+   held-in column, a larger opening line and a rule drawn in the accent, so
+   it reads as designed rather than as a paragraph nobody styled. */
+.band-navy .wrap > .feature,.feature{max-width:46rem;margin-inline:auto}
+.feature .eyebrow{margin-bottom:.9rem}
+.feature h2::after{content:"";display:block;width:3.5rem;height:3px;
+  margin:.85rem 0 0;border-radius:2px;background:var(--accent)}
+.feature.center h2::after{margin-inline:auto}
+.band-navy .feature h2::after{background:var(--accent-pale)}
+.feature > p:first-of-type{font-size:1.16rem;line-height:1.6}
 
 /* ---------- FACT LISTS / TABLES ---------- */
 .facts{list-style:none;margin:0;padding:0}
@@ -226,6 +252,52 @@ tbody tr:nth-child(even){background:var(--stripe)}
 .stat span{display:block;font-size:.88rem;letter-spacing:.05em;text-transform:uppercase;
   color:var(--ink-soft);margin-top:.35rem}
 .band-navy .stat span{color:var(--on-brand-soft)}
+
+/* ---------- TESTIMONIALS ---------- */
+.testimonial{display:flex;flex-direction:column;gap:.7rem}
+.testimonial blockquote{margin:0;font-size:1.05rem;line-height:1.55}
+.testimonial blockquote::before{content:"\201C"}
+.testimonial blockquote::after{content:"\201D"}
+.testimonial figcaption{display:flex;flex-direction:column;font-size:.9rem}
+.testimonial figcaption span{color:var(--ink-soft)}
+.stars{color:var(--accent);letter-spacing:.1em;margin:0}
+/* A testimonial card is a light surface, same trap as .card above - keep it
+   readable when the section sits on a navy band. */
+.band-navy .testimonial blockquote,.band-navy .testimonial figcaption b{color:var(--ink)}
+.band-navy .testimonial figcaption span{color:var(--ink-soft)}
+.band-navy .stars{color:var(--red)}
+
+/* ---------- FAQ ---------- */
+.faq details{border-bottom:1px solid var(--line);padding:1.1rem 0}
+.faq details:first-child{border-top:1px solid var(--line)}
+.faq summary{cursor:pointer;font-family:var(--ui);font-weight:600;
+  font-size:1.02rem;color:var(--navy);list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"+";display:inline-block;width:1.2em;color:var(--red)}
+.faq details[open] summary::before{content:"\2212"}
+.faq details > div{padding:.7rem 0 0 1.2em}
+.band-navy .faq details{border-color:rgba(255,255,255,.18)}
+.band-navy .faq summary{color:var(--on-dark)}
+
+/* ---------- TRUST BAR ---------- */
+.trustbar-section{padding-block:1.4rem}
+.trustbar{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 2.2rem;
+  list-style:none;margin:0;padding:0;text-align:center;
+  font-family:var(--ui);text-transform:uppercase;letter-spacing:.05em;font-size:.86rem}
+
+/* ---------- BEFORE / AFTER ---------- */
+.beforeafter{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1.6rem}
+.beforeafter img{width:100%;aspect-ratio:4/3;object-fit:cover;
+  border-radius:var(--radius);box-shadow:var(--shadow)}
+.beforeafter figcaption{text-align:center;font-family:var(--ui);text-transform:uppercase;
+  letter-spacing:.06em;font-size:.8rem;color:var(--ink-soft);margin-top:.6rem}
+
+/* ---------- HOURS ---------- */
+.hours{list-style:none;margin:0;padding:0}
+.hours li{display:flex;justify-content:space-between;gap:1rem;padding:.65rem 0;
+  border-bottom:1px solid var(--line)}
+.hours li:last-child{border-bottom:0}
+.band-navy .hours li{border-color:rgba(255,255,255,.18)}
 
 /* ---------- CALLOUTS ---------- */
 .note{border-left:5px solid var(--red);background:var(--note-bg);padding:1.1rem 1.3rem;
@@ -304,6 +376,8 @@ tbody tr:nth-child(even){background:var(--stripe)}
   .facts b{min-width:100%}
   .btn-row{flex-direction:column}
   .btn-row .btn{width:100%}
+  .beforeafter{grid-template-columns:1fr}
+  .trustbar{gap:.4rem 1.2rem;font-size:.8rem}
 }
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important;scroll-behavior:auto!important}

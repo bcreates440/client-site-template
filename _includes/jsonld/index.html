@@ -1,0 +1,20 @@
+{%- comment -%}
+  LocalBusiness structured data for the homepage - built only from facts
+  already public in _data/site.yml and the footer. Swap "LocalBusiness" for
+  a more specific type (e.g. "Restaurant", "HomeAndConstructionBusiness")
+  when the schema.org vocabulary has one that fits the client better.
+{%- endcomment -%}
+{%- assign s = site.data.site -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "{{ s.org_name }}",
+  "url": "{{ site.url }}/",
+  "image": "{{ site.url }}/{{ s.share_image }}",
+  "description": "{{ s.org_blurb }}",
+  "email": "{{ s.email }}",
+  "telephone": "{{ s.phone_dial }}",
+  "address": "{{ s.address }}"
+}
+</script>

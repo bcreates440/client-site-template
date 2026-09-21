@@ -1,0 +1,56 @@
+{%- comment -%}
+  The icon set, as one inline SVG sprite. Included once per page by
+  _layouts/page.html, then referenced anywhere with:
+
+      <svg class="icon"><use href="#i-key"></use></svg>
+
+  Why inline rather than image files: no extra requests, nothing to go
+  missing, and the shapes take their colour from css/styles.css - so they
+  rebrand with the rest of the site instead of being stranded in the old
+  palette. There are no colours in this file on purpose; `.icon` in the
+  stylesheet supplies the stroke from a token.
+
+  To add one: copy a <symbol>, give it an id starting `i-`, keep the
+  24x24 viewBox, and draw with strokes only (no fills).
+{%- endcomment -%}
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <defs>
+    <symbol id="i-send" viewBox="0 0 24 24">
+      <path d="M12 3.5v12M12 3.5L7.5 8M12 3.5L16.5 8"/>
+      <path d="M4 15.5v3.5a1.5 1.5 0 001.5 1.5h13a1.5 1.5 0 001.5-1.5v-3.5"/>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8.25"/>
+      <path d="M12 7.25V12l3.25 1.9"/>
+    </symbol>
+    <symbol id="i-key" viewBox="0 0 24 24">
+      <circle cx="8" cy="12" r="4.25"/>
+      <path d="M12.25 12H21"/>
+      <path d="M18 12v3.25"/>
+      <path d="M15 12v2.25"/>
+    </symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24">
+      <path d="M12 3.25l7 3v5.75c0 4-2.9 6.9-7 8.75-4.1-1.85-7-4.75-7-8.75V6.25l7-3z"/>
+      <path d="M9.25 12l2 2 3.5-3.6"/>
+    </symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24">
+      <path d="M3.5 11.2V4.6a1 1 0 011-1h6.6l9 9-7.6 7.6-9-9z"/>
+      <circle cx="7.9" cy="7.9" r="1.35"/>
+    </symbol>
+    <symbol id="i-person" viewBox="0 0 24 24">
+      <circle cx="12" cy="8" r="3.6"/>
+      <path d="M5 20.25c0-3.6 3.1-6.1 7-6.1s7 2.5 7 6.1"/>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="6.25"/>
+      <path d="M15.6 15.6L20.5 20.5"/>
+    </symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24">
+      <path d="M20.25 11.75a6.75 6.75 0 01-6.75 6.75H8.6L4.5 21.5v-4.4a6.75 6.75 0 013.1-12.85h5.9a6.75 6.75 0 016.75 6.75z"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="8.25"/>
+      <path d="M8.5 12.2l2.5 2.5 4.5-4.9"/>
+    </symbol>
+  </defs>
+</svg>

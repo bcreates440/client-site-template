@@ -13,6 +13,7 @@
 {%- include head.html %}
 </head>
 <body>
+{% include icons.html %}
 {% include header.html %}
 <main id="main">
 {%- if page.blocks %}
@@ -30,6 +31,11 @@
 {%- when 'strip' %}{% include blocks/strip.html b=b %}
 {%- when 'carousel' %}{% include blocks/carousel.html b=b %}
 {%- when 'stats' %}{% include blocks/stats.html b=b %}
+{%- when 'testimonials' %}{% include blocks/testimonials.html b=b %}
+{%- when 'faq' %}{% include blocks/faq.html b=b %}
+{%- when 'trustbar' %}{% include blocks/trustbar.html b=b %}
+{%- when 'beforeafter' %}{% include blocks/beforeafter.html b=b %}
+{%- when 'hours' %}{% include blocks/hours.html b=b %}
 {%- when 'raw' %}{{ b.html }}
 {%- else %}<!-- unknown block type "{{ b.type }}" - check the spelling against _includes/blocks/ -->
 {%- endcase %}

@@ -1,0 +1,29 @@
+{%- comment -%}
+  Two labelled photos side by side - proof of work. Plain CSS grid, no
+  drag-slider: sliders need JS, are fiddly on touch, and are near-unusable
+  with a keyboard.
+{%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'paper' }}">
+    <div class="wrap{% if b.center %} center{% endif %}">
+      {%- if b.eyebrow %}
+      <p class="eyebrow">{{ b.eyebrow }}</p>
+      {%- endif %}
+      {%- if b.heading %}
+      <h2>{{ b.heading }}</h2>
+      {%- endif %}
+      <div class="beforeafter">
+        <figure>
+          <img src="{{ b.before }}" loading="lazy" alt="{{ b.before_alt }}">
+          <figcaption>Before</figcaption>
+        </figure>
+        <figure>
+          <img src="{{ b.after }}" loading="lazy" alt="{{ b.after_alt }}">
+          <figcaption>After</figcaption>
+        </figure>
+      </div>
+      {%- if b.caption %}
+      <p class="btn-note" style="margin-top:1rem">{% include md.html text=b.caption inline=true %}</p>
+      {%- endif %}
+    </div>
+  </section>

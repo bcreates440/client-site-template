@@ -1,0 +1,18 @@
+{%- comment -%}
+  A short row of checkable claims (licensed, years in business, review
+  count) meant to sit directly under the hero. Text only, on purpose - no
+  icons or images, so it costs nothing and never causes layout shift.
+{%- endcomment -%}
+{%- assign b = include.b -%}
+  <section class="band-{{ b.band | default: 'navy' }} trustbar-section">
+    <div class="wrap">
+      <ul class="trustbar">
+        {%- for item in b.items %}
+        <li>{{ item.label }}</li>
+        {%- endfor %}
+      </ul>
+      {%- if b.note %}
+      <p class="btn-note center" style="margin-top:.6rem">{% include md.html text=b.note inline=true %}</p>
+      {%- endif %}
+    </div>
+  </section>

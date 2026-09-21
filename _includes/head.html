@@ -22,13 +22,14 @@
 <meta name="twitter:description" content="{{ page.tw_description | default: page.description }}">
 <meta name="twitter:image" content="{{ site.url }}/{{ s.share_image }}">
 <link rel="stylesheet" href="css/styles.css">
+{%- comment -%}
+  jsonld: true on a page includes _includes/jsonld/<slug>.html if it exists.
+  Only "index" ships one - add a matching file under jsonld/ before turning
+  this on for another page, or it silently does nothing (check.rb does not
+  catch this - it's schema-driven, not include-existence-driven).
+{%- endcomment -%}
 {%- if page.jsonld %}
 {% case page.slug %}
   {%- when 'index' %}{% include jsonld/index.html %}
-  {%- when 'show' %}{% include jsonld/show.html %}
-  {%- when 'vendors' %}{% include jsonld/vendors.html %}
-  {%- when 'membership' %}{% include jsonld/membership.html %}
-  {%- when 'about' %}{% include jsonld/about.html %}
-  {%- when 'contact' %}{% include jsonld/contact.html %}
 {% endcase %}
 {%- endif %}

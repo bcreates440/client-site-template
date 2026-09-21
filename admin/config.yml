@@ -150,8 +150,10 @@ collections:
                 summary: "{{fields.label}}"
                 fields:
                   - { label: "Button text", name: "label", widget: "string" }
-                  - { label: "Address", name: "url", widget: "string",
-                      hint: "A page on this site (about.html), a spot on this page (#contact), or a full web address." }
+                  - { label: "Address", name: "url", widget: "string", required: false,
+                      hint: "A page on this site (about.html), a spot on this page (#contact), or a full web address. Use this OR the one below, not both." }
+                  - { label: "Or a link from Site-wide details", name: "link", widget: "string", required: false,
+                      hint: "The name of a link field in Site-wide details - for example phone_href or email_href. Keeps the number or address in one place." }
                   - label: "Style"
                     name: "style"
                     widget: "select"
@@ -192,6 +194,8 @@ collections:
                   - { label: "Navy", value: "navy" }
                   - { label: "Red", value: "red" }
               - &narrow { label: "Narrow column", name: "narrow", widget: "boolean", required: false, default: true }
+              - { label: "Feature treatment (accent rule, larger opening line)", name: "feature",
+                  widget: "boolean", required: false, default: false }
               - &center { label: "Centre the heading", name: "center", widget: "boolean", required: false, default: false }
               - *eyebrow
               - { label: "Heading", name: "heading", widget: "string", required: false }
@@ -266,6 +270,12 @@ collections:
                 summary: "{{fields.title}}"
                 fields:
                   - { label: "Card heading", name: "title", widget: "string" }
+                  - label: "Icon"
+                    name: "icon"
+                    widget: "select"
+                    required: false
+                    options: ["", "send", "clock", "key", "shield", "tag", "person", "search", "chat", "check"]
+                    hint: "A small line drawing above the heading. Leave blank for none."
                   - { label: "Red edge (overrides the setting above)", name: "accent", widget: "boolean", required: false }
                   - { label: "Note to future editors", name: "comment", widget: "text", required: false,
                       hint: "Not shown on the page. It appears only in the page's underlying code." }
@@ -489,6 +499,101 @@ collections:
                 hint: >
                   An escape hatch for something the other sections cannot do.
                   Anything typed here goes onto the page exactly as written.
+
+          # ---------------------------------------------- testimonials -----
+          - label: "Reviews"
+            name: "testimonials"
+            widget: "object"
+            summary: "Reviews - {{fields.heading}}"
+            fields:
+              - *band
+              - *center
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string", required: false }
+              - { label: "How many across", name: "columns", widget: "select", required: false, default: "g3", options: ["g2", "g3"] }
+              - label: "Reviews"
+                name: "items"
+                widget: "list"
+                collapsed: true
+                summary: "{{fields.name}}"
+                fields:
+                  - { label: "What they said", name: "quote", widget: "text" }
+                  - { label: "Who said it", name: "name", widget: "string" }
+                  - { label: "Detail under the name", name: "detail", widget: "string", required: false,
+                      hint: "Town, job type, or date - keeps it credible." }
+                  - { label: "Stars out of 5", name: "rating", widget: "number", required: false, value_type: "int", min: 1, max: 5 }
+              - *buttons
+
+          # -------------------------------------------------------- faq ----
+          - label: "Questions & answers"
+            name: "faq"
+            widget: "object"
+            summary: "FAQ - {{fields.heading}}"
+            fields:
+              - *band
+              - *narrow
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string", required: false }
+              - label: "Questions"
+                name: "items"
+                widget: "list"
+                collapsed: true
+                summary: "{{fields.q}}"
+                fields:
+                  - { label: "Question", name: "q", widget: "string" }
+                  - { label: "Answer", name: "a", widget: "markdown", modes: ["raw"] }
+              - *buttons
+
+          # --------------------------------------------------- trustbar ----
+          - label: "Trust bar"
+            name: "trustbar"
+            widget: "object"
+            summary: "Trust bar"
+            fields:
+              - *band
+              - label: "Claims"
+                name: "items"
+                widget: "list"
+                summary: "{{fields.label}}"
+                fields:
+                  - { label: "Claim", name: "label", widget: "string",
+                      hint: "Short and checkable: 'Licensed & insured', '4.9 from 120 reviews', 'Serving the county since 2004'." }
+              - { label: "Small print underneath", name: "note", widget: "text", required: false }
+
+          # ------------------------------------------------ beforeafter ----
+          - label: "Before & after"
+            name: "beforeafter"
+            widget: "object"
+            summary: "Before/after - {{fields.heading}}"
+            fields:
+              - *band
+              - *center
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string", required: false }
+              - { label: "Before photo", name: "before", widget: "image" }
+              - { label: "Before photo description", name: "before_alt", widget: "string" }
+              - { label: "After photo", name: "after", widget: "image" }
+              - { label: "After photo description", name: "after_alt", widget: "string" }
+              - { label: "Caption", name: "caption", widget: "text", required: false }
+
+          # ------------------------------------------------------ hours ----
+          - label: "Opening hours"
+            name: "hours"
+            widget: "object"
+            summary: "Hours"
+            fields:
+              - *band
+              - *narrow
+              - { label: "Heading", name: "heading", widget: "string", required: false }
+              - label: "Days"
+                name: "rows"
+                widget: "list"
+                summary: "{{fields.day}}"
+                fields:
+                  - { label: "Day", name: "day", widget: "string" }
+                  - { label: "Hours", name: "time", widget: "string", hint: "e.g. 9am - 5pm, or Closed" }
+              - { label: "Note", name: "note", widget: "text", required: false }
+              - *buttons
 
   # =========================================================================
   #  THE FACTS THAT APPEAR ON EVERY PAGE
