@@ -465,9 +465,11 @@ collections:
           - label: "Big numbers"
             name: "stats"
             widget: "object"
-            summary: "Numbers"
+            summary: "Numbers - {{fields.heading}}"
             fields:
               - *band
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string", required: false }
               - label: "Numbers"
                 name: "stats"
                 widget: "list"
@@ -475,6 +477,8 @@ collections:
                 fields:
                   - { label: "The number", name: "figure", widget: "string" }
                   - { label: "What it counts", name: "label", widget: "string" }
+              - { label: "Note underneath", name: "note", widget: "text", required: false }
+              - *buttons
 
           # ------------------------------------------------------- cta -----
           - label: "Closing call to action"

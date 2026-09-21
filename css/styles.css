@@ -201,6 +201,7 @@ section{padding-block:clamp(2.6rem,6vw,4.4rem)}
 
 /* ---------- GRID + CARDS ---------- */
 .grid{display:grid;gap:1.4rem}
+.grid > *{min-width:0}
 .g2{grid-template-columns:repeat(2,1fr)}
 .g3{grid-template-columns:repeat(3,1fr)}
 .g4{grid-template-columns:repeat(4,1fr)}
@@ -210,7 +211,7 @@ section{padding-block:clamp(2.6rem,6vw,4.4rem)}
 .card p:last-child{margin-bottom:0}
 .card-accent{border-top:5px solid var(--red)}
 .icard{padding:0;overflow:hidden}
-.icard img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.icard img{width:100%;aspect-ratio:16/9;object-fit:cover}
 .icard .pad{padding:1.25rem}
 .split{display:grid;grid-template-columns:1.05fr .95fr;gap:2.4rem;align-items:center}
 .split img{border-radius:var(--radius);box-shadow:var(--shadow-lg)}

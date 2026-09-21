@@ -1,13 +1,25 @@
 {%- comment -%}
   A row of big numbers. Each one is a figure and a short label under it.
+  Optional heading/eyebrow above, and a note or buttons below, for when the
+  numbers need a sentence of context (a test date, what was measured).
 {%- endcomment -%}
 {%- assign b = include.b -%}
   <section class="band-{{ b.band | default: 'paper' }}" style="padding-block:2.4rem">
-    <div class="wrap">
+    <div class="wrap{% if b.heading %} center{% endif %}">
+      {%- if b.eyebrow %}
+      <p class="eyebrow">{{ b.eyebrow }}</p>
+      {%- endif %}
+      {%- if b.heading %}
+      <h2 style="margin-bottom:1.6rem">{{ b.heading }}</h2>
+      {%- endif %}
       <ul class="stats" style="list-style:none;margin:0;padding:0">
         {%- for s in b.stats %}
         <li class="stat"><b>{{ s.figure }}</b><span>{{ s.label }}</span></li>
         {%- endfor %}
       </ul>
+      {%- if b.note %}
+      <p class="btn-note center" style="margin-top:1.2rem">{% include md.html text=b.note inline=true %}</p>
+      {%- endif %}
+      {%- include blocks/buttons.html buttons=b.buttons center=true style="margin-top:1.4rem" %}
     </div>
   </section>

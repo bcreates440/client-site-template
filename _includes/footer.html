@@ -22,17 +22,19 @@
 {%- endfor %}
         </ul>
       </div>
+{%- if s.facebook != "" or s.instagram != "" %}
       <div>
         <h3>Connect</h3>
         <ul>
-{%- if s.facebook %}
+{%- if s.facebook != "" %}
           <li><a href="{{ s.facebook }}" target="_blank" rel="noopener">Facebook</a></li>
 {%- endif %}
-{%- if s.instagram %}
+{%- if s.instagram != "" %}
           <li><a href="{{ s.instagram }}" target="_blank" rel="noopener">Instagram</a></li>
 {%- endif %}
         </ul>
       </div>
+{%- endif %}
       <div>
         <h3>Contact</h3>
         <p>
