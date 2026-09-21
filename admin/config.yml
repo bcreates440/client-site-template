@@ -28,10 +28,6 @@ backend:
     uploadMedia: 'Upload {{path}}'
     deleteMedia: 'Delete {{path}}'
 
-# Lets the editor run against files on your own computer for testing, using
-# "npx decap-server". Harmless on the live site - it is ignored there.
-local_backend: true
-
 media_folder: "images"
 public_folder: "images"
 
@@ -55,7 +51,7 @@ collections:
       add one, drag the handle to reorder, and the rubbish bin to remove one.
     folder: "_content"
     extension: "html"
-    format: "yaml-frontmatter"
+    format: "html-frontmatter"
     create: true
     delete: false
     slug: "{{fields.slug}}"

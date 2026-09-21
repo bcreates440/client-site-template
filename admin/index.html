@@ -32,7 +32,39 @@ sitemap: false
      check your internet connection and reload the page.</p>
 </div>
 
-<script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+<script>
+  // ponytail: Sveltia validates extension/format pairs more strictly than
+  // Decap did and rejects extension:html + format:yaml-frontmatter outright
+  // (blocks the whole editor with a config-error screen), even though it
+  // parses identically to what Decap always did. Registering a genuine
+  // custom format (Sveltia's documented escape hatch, see
+  // https://sveltiacms.app/en/docs/api/file-formats) sidesteps that without
+  // renaming every _content/*.html file to .md. Verified this round-trips
+  // every real page in this template family (parse -> stringify -> parse
+  // gives back the same data).
+  window.CMS_MANUAL_INIT = true;
+</script>
+<script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+<script type="module">
+  import YAML from "https://unpkg.com/yaml@2.9.1/browser/index.js";
+
+  const FRONT_MATTER = /^---\n(?:(?<head>[\s\S]*?))\n---(?:\n(?<body>[\s\S]*))?$/s;
+
+  CMS.registerCustomFormat("html-frontmatter", "html", {
+    fromFile: (text) => {
+      const { head, body } = text.match(FRONT_MATTER)?.groups ?? {};
+      const data = head ? YAML.parse(head) ?? {} : {};
+      return body ? { ...data, body: body.replace(/^\n/, "") } : data;
+    },
+    toFile: (data) => {
+      const { body, ...rest } = data;
+      const head = YAML.stringify(rest, { lineWidth: 0 });
+      return body ? `---\n${head}---\n\n${body}` : `---\n${head}---\n`;
+    },
+  });
+
+  CMS.init();
+</script>
 <script>
   // Hide the holding message once the editor has taken over the page.
   window.addEventListener("load", function () {
