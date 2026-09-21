@@ -32,7 +32,7 @@ sitemap: false
      check your internet connection and reload the page.</p>
 </div>
 
-<script src="https://unpkg.com/decap-cms@^3.8.4/dist/decap-cms.js"></script>
+<script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
 <script>
   // Hide the holding message once the editor has taken over the page.
   window.addEventListener("load", function () {
@@ -40,6 +40,13 @@ sitemap: false
       var boot = document.getElementById("boot");
       if (boot && document.querySelector("#nc-root, .css-nc-root")) boot.remove();
     }, 1500);
+    // ponytail: fallback in case Sveltia's mount selector ever diverges from
+    // Decap's #nc-root convention it currently reuses; remove boot regardless
+    // after 6s so a selector mismatch doesn't strand the loading message.
+    setTimeout(function () {
+      var boot = document.getElementById("boot");
+      if (boot) boot.remove();
+    }, 6000);
   });
 </script>
 

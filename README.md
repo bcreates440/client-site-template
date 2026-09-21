@@ -1,20 +1,26 @@
 # client-site-template
 
-Starting point for a new client website: Jekyll + GitHub Pages + a [Decap
-CMS](https://decapcms.org/) editor at `/admin/`, signed in through the
-shared [client-sites-auth](https://github.com/bcreates440/client-sites-auth)
-worker. Proven plumbing (layouts, the section-block system, `check.rb`)
-carried over from a live site; the content is placeholder text for you to
-replace.
+Starting point for a new client website: Jekyll + Cloudflare Pages + a
+[Sveltia CMS](https://github.com/sveltia/sveltia-cms) editor at `/admin/`,
+signed in through a per-client Cloudflare Worker (see
+[client-sites-auth](https://github.com/bcreates440/client-sites-auth) for the
+worker code to copy). Proven plumbing (layouts, the section-block system,
+`check.rb`) carried over from a live site; the content is placeholder text
+for you to replace.
 
 ## Spin up a new client site
 
+0. Provision the client's own Cloudflare Worker for CMS login — see
+   `ops/templates/onboarding.md`, "CMS Auth Setup". Do this before the
+   steps below; you'll need the worker URL for step 2.
 1. Click **Use this template** (top of this repo's GitHub page) → create a
    new repository for the client.
 2. In the new repo, edit `admin/config.yml`:
    - `backend.repo`: set to `<owner>/<new-repo-name>`
+   - `backend.base_url`: the client's own `<slug>-cms-auth` worker URL from
+     step 0 — not the shared worker
    - `site_url` / `display_url`: the client's real domain (or the
-     `github.io` URL for now)
+     `*.pages.dev` URL for now)
 3. Edit `_config.yml`: set `url`, `title`, `description`.
 4. Edit `_data/site.yml`: the real org name, contact info, socials, and
    `theme_color` (match it to `--brand` — a `<meta>` tag can't read a CSS
@@ -26,7 +32,9 @@ replace.
    or update the references in `_includes/header.html`,
    `_includes/footer.html` and `admin/config.yml`'s `logo_url`).
 7. Run `ruby check.rb` — must say `ALL CHECKS PASSED` before you push.
-8. `git push`, then enable GitHub Pages in the new repo's Settings.
+8. `git push`, then connect the repo in Cloudflare (Workers & Pages →
+   Create application → Pages → Connect to Git). Build command
+   `bundle exec jekyll build`, output directory `_site`.
 9. Add the client as a collaborator (**Settings → Collaborators → Add
    people**, **Write** access, not Admin) once they have a GitHub account
    with a verified email.
@@ -34,8 +42,10 @@ replace.
 
 ## What's already wired up
 
-- **Login** — `admin/config.yml` already points at the shared OAuth worker.
-  No per-client Cloudflare/GitHub OAuth App setup needed.
+- **Login** — `admin/config.yml`'s `backend.base_url` needs pointing at
+  this client's own `<slug>-cms-auth` Cloudflare Worker (step 0 above) —
+  each client gets an isolated worker so one broken worker can't take down
+  every client's editor at once.
 - **Block system** — `_layouts/page.html` renders a page from a list of
   typed sections (hero, prose, cards, split, table, gallery, strip,
   carousel, people, stats, cta, raw). See `_includes/blocks/` for each
