@@ -19,8 +19,14 @@
      Must clear 4.5:1 against --cream, because links are body-text sized. */
   --accent:#C8202E; --accent-dark:#9E1824;
 
-  /* --highlight: focus rings and the "attention" callout. */
+  /* --highlight: the "attention" callout tint. It is a SURFACE colour, not an
+     indicator colour - don't draw the focus ring with it. */
   --highlight:#C8A24A;
+
+  /* --focus: the keyboard focus ring. White core + near-black halo, so the
+     same ring stays visible on dark bands, the accent CTA band, and paper
+     alike. Re-check both against any new palette: WCAG 2.4.11 wants 3:1. */
+  --focus:#FFFFFF; --focus-halo:#21242F;
 
   /* ---- SURFACES + TEXT ---- */
   --cream:#F7F5F0; --paper:#FFFFFF;
@@ -31,15 +37,15 @@
      which meant it stayed navy-blue no matter what --brand was set to. If you
      change --brand or --accent, re-tune these to match. ---- */
   --on-dark:#FFFFFF;         /* text/icons on any dark surface */
-  --on-brand:var(--on-brand);        /* body text on a brand band */
-  --on-brand-soft:var(--on-brand-soft);   /* muted text on a brand band */
-  --on-brand-faint:var(--on-brand-faint);  /* the legal line in the footer */
-  --on-brand-link:var(--on-brand-link);   /* links on a brand band - accent fails there */
-  --accent-pale:var(--accent-pale);     /* eyebrow on a brand band */
-  --on-accent-soft:var(--on-accent-soft);  /* muted text on an accent band */
-  --note-bg:var(--note-bg);         /* boxed note */
-  --alert-bg:var(--alert-bg);        /* attention box (tinted from --highlight) */
-  --stripe:var(--stripe);          /* every other table row */
+  --on-brand:#E6EAF4;        /* body text on a brand band - 12.28:1 on --brand */
+  --on-brand-soft:#AEBBD8;   /* muted text on a brand band - 7.68:1 */
+  --on-brand-faint:#8FA0C4;  /* the legal line in the footer - 5.63:1 */
+  --on-brand-link:#FFC9CE;   /* links on a brand band - accent fails there - 10.21:1 */
+  --accent-pale:#F2A6AD;     /* eyebrow on a brand band - 7.63:1 */
+  --on-accent-soft:#FFE2E4;  /* muted text on an accent band - 4.66:1 on --accent */
+  --note-bg:#FFF6F1;         /* boxed note */
+  --alert-bg:#FFFAEC;        /* attention box (tinted from --highlight) */
+  --stripe:#FBFAF7;          /* every other table row */
   --hero-veil:9,18,40;       /* r,g,b of the darkening layer over a hero photo */
 
   /* ---- TYPE ---- */
@@ -89,7 +95,11 @@ hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
 .skip{position:absolute;left:-9999px;top:0;background:var(--red);color:var(--on-dark);
   padding:.7rem 1rem;z-index:200}
 .skip:focus{left:0}
-:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+/* Two-tone focus ring: a light core with a dark halo, so one rule stays
+   visible on every surface. Reusing --highlight here fails WCAG 2.4.11 on
+   dark bands - on the default palette it reached 1.02:1 on the accent band. */
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;
+  box-shadow:0 0 0 6px var(--focus-halo)}
 
 /* ---------- BUTTONS ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
@@ -123,7 +133,11 @@ hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
   text-transform:uppercase;line-height:1.1}
 .brand span{display:block;font-size:.72rem;letter-spacing:.11em;text-transform:uppercase;
   color:var(--on-brand-soft)}
+/* The checkbox drives the mobile menu. Above 820px its label is display:none
+   and the nav is already open, so leaving the checkbox in the tab order puts
+   an invisible control that does nothing at tab stop 2 on desktop. */
 .nav-toggle{position:absolute;opacity:0;width:1px;height:1px}
+@media (min-width:821px){.nav-toggle{display:none}}
 .nav-label{display:none;color:var(--on-dark);font-size:1.6rem;line-height:1;cursor:pointer;
   padding:.4rem .7rem;border:1px solid rgba(255,255,255,.35);border-radius:8px;
   min-height:44px;align-items:center}

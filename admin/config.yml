@@ -140,7 +140,6 @@ collections:
                   hint: "Use <br> where you want the line to break." }
               - { label: "Sub-heading", name: "subheading", widget: "string", required: false }
               - { label: "Opening paragraph", name: "intro", widget: "markdown", modes: ["raw"] }
-              - { label: "Show the countdown line", name: "countdown", widget: "boolean", required: false, default: false }
               - &buttons
                 label: "Buttons"
                 name: "buttons"

@@ -168,6 +168,38 @@ tmpl_bad = 0
 end
 ok "no hardcoded colours in templates or page content" if tmpl_bad.zero?
 
+# --- 5. every {% include %} target actually exists -------------------------
+# Added 2026-09-20. _layouts/page.html called countdown.html for months; the
+# file was never carried over from wwca-site when the template was
+# generalized. Nothing caught it because no page set the flag that triggers
+# it - but the moment one did, the build would die and the site would just
+# stop updating.
+includes = Set.new
+(Dir["_layouts/*.html"] + Dir["_includes/**/*.html"] + Dir["_content/*.html"]).each do |f|
+  File.read(f, encoding: "utf-8").scan(/\{%-?\s*include\s+([A-Za-z0-9_\/.-]+)/) { includes << $1 }
+end
+missing_inc = includes.reject { |i| File.exist?(File.join("_includes", i)) }.sort
+if missing_inc.empty?
+  ok "all #{includes.size} {% include %} targets exist"
+else
+  missing_inc.each { |i| bad "missing _includes/#{i} - any page reaching it fails the build" }
+end
+
+# --- 6. no :root token defined in terms of itself --------------------------
+# Added 2026-09-20 after finding all nine derived tokens in
+# client-site-template written as `--on-brand:var(--on-brand)`. That is a
+# cycle, which CSS treats as invalid at computed-value time, so the token
+# silently resolves to nothing. Check 4 above passes it, because the colour
+# IS technically inside :root - it just never resolves.
+root_css = File.read("css/styles.css", encoding: "utf-8")[/:root\s*\{(.*?)\}/m, 1].to_s
+circular = root_css.scan(/--([a-z0-9-]+)\s*:\s*var\(\s*--([a-z0-9-]+)\s*\)/i)
+                   .select { |name, ref| name.downcase == ref.downcase }.map(&:first).uniq
+if circular.empty?
+  ok "no :root token is defined in terms of itself"
+else
+  circular.each { |t| bad "--#{t} in :root is defined as var(--#{t}) - a cycle, so it resolves to nothing" }
+end
+
 
 puts ""
 puts $fail.zero? ? "ALL CHECKS PASSED" : "#{$fail} problem(s) found"

@@ -1,7 +1,11 @@
 {%- comment -%}
-  The big banner at the top of the home page, over the mountain photograph.
-  countdown: true leaves room for the "days until the doors open" line, which
-  is filled in by the small script at the bottom of the page.
+  The big banner at the top of a page. The background is drawn from :root
+  tokens, not a photograph.
+
+  The event countdown that used to hang off this block was removed 2026-09-20:
+  the include it called was never carried over from wwca-site, so the whole
+  path was dead. The working version lives in wwca-site/_includes/countdown.html
+  and needs show_start + show_days in _data/site.yml to be ported properly.
 {%- endcomment -%}
 {%- assign b = include.b -%}
   <div class="hero">
@@ -14,9 +18,6 @@
       <p class="hero-sub">{% include md.html text=b.subheading inline=true %}</p>
       {%- endif %}
       {% include md.html text=b.intro %}
-      {%- if b.countdown %}
-      <p id="countdown" class="hero-sub" style="margin:1.4rem 0 .4rem"></p>
-      {%- endif %}
       {%- include blocks/buttons.html buttons=b.buttons center=true %}
       {%- if b.note %}
       <p class="btn-note">{% include md.html text=b.note inline=true %}</p>
