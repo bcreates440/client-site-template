@@ -1,0 +1,36 @@
+{%- comment -%}
+  Showcase - a narrow panel carrying an overlaid headline and a small floating
+  detail card, beside a wider panel. Both panels take a photo; without one they
+  fall back to a tonal panel drawn from the theme tokens, so the block is safe
+  to place before the photography exists (unlike `split`, which renders a broken
+  image when `image` is empty).
+{%- endcomment -%}
+{%- assign band = b.band | default: 'paper' -%}
+<section class="band-{{ band }}{% if b.id %}" id="{{ b.id }}{% endif %}">
+  <div class="wrap">
+    <div class="showcase">
+
+      <div class="sc-narrow{% unless b.image %} sc-tonal{% endunless %}"
+           {% if b.image %}style="background-image:url('{{ b.image }}')"{% endif %}
+           {% if b.image_alt %}role="img" aria-label="{{ b.image_alt }}"{% endif %}>
+        {%- if b.eyebrow %}<p class="eyebrow sc-eyebrow">{{ b.eyebrow }}</p>{% endif -%}
+        {%- if b.heading %}<h2 class="sc-heading">{% include md.html text=b.heading inline=true %}</h2>{% endif -%}
+        {%- if b.card_title %}
+        <div class="sc-card">
+          <b>{{ b.card_title }}</b>
+          {%- if b.card_detail %}<span>{{ b.card_detail }}</span>{% endif -%}
+          {%- if b.card_note %}<span class="sc-note">{{ b.card_note }}</span>{% endif -%}
+        </div>
+        {%- endif -%}
+      </div>
+
+      <div class="sc-wide{% unless b.wide_image %} sc-tonal{% endunless %}"
+           {% if b.wide_image %}style="background-image:url('{{ b.wide_image }}')"{% endif %}
+           {% if b.wide_image_alt %}role="img" aria-label="{{ b.wide_image_alt }}"{% endif %}>
+        {%- if b.wide_text %}<p class="sc-widetext">{% include md.html text=b.wide_text inline=true %}</p>{% endif -%}
+      </div>
+
+    </div>
+    {%- if b.buttons %}{% include blocks/buttons.html buttons=b.buttons %}{% endif -%}
+  </div>
+</section>

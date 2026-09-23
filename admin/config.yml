@@ -255,7 +255,7 @@ collections:
                 required: false
                 hint: "Lets a button jump straight here, e.g. #services"
               - *center
-              - &columns { label: "Cards across", name: "columns", widget: "select", required: false, default: "g3", options: ["g2", "g3"] }
+              - &columns { label: "Cards across", name: "columns", widget: "select", required: false, default: "g3", options: ["g2", "g3", "g4"] }
               - { label: "Red edge on the cards", name: "accent", widget: "boolean", required: false, default: true }
               - *eyebrow
               - { label: "Heading", name: "heading", widget: "string", required: false }
@@ -559,6 +559,62 @@ collections:
                   - { label: "Claim", name: "label", widget: "string",
                       hint: "Short and checkable: 'Licensed & insured', '4.9 from 120 reviews', 'Serving the county since 2004'." }
               - { label: "Small print underneath", name: "note", widget: "text", required: false }
+
+          # ---------------------------------------------------- showcase ----
+          - label: "Showcase (two panels)"
+            name: "showcase"
+            widget: "object"
+            summary: "Showcase - {{fields.heading}}"
+            fields:
+              - *band
+              - *anchor_id
+              - *eyebrow
+              - { label: "Heading (sits on the narrow panel)", name: "heading", widget: "string", required: false }
+              - { label: "Narrow panel photo", name: "image", widget: "image", required: false,
+                  hint: "Tall crop. Leave empty and the panel falls back to a plain tone." }
+              - { label: "Narrow panel photo description", name: "image_alt", widget: "string", required: false }
+              - { label: "Wide panel photo", name: "wide_image", widget: "image", required: false }
+              - { label: "Wide panel photo description", name: "wide_image_alt", widget: "string", required: false }
+              - { label: "Wide panel caption", name: "wide_text", widget: "string", required: false }
+              - { label: "Floating card - title", name: "card_title", widget: "string", required: false }
+              - { label: "Floating card - detail", name: "card_detail", widget: "string", required: false }
+              - { label: "Floating card - small print", name: "card_note", widget: "string", required: false }
+              - *buttons
+
+          # --------------------------------------------------- bignumber ----
+          - label: "Big number statement"
+            name: "bignumber"
+            widget: "object"
+            summary: "Big number - {{fields.eyebrow}}"
+            fields:
+              - *band
+              - *eyebrow
+              - label: "The statement, in figure-and-words pairs"
+                name: "items"
+                widget: "list"
+                summary: "{{fields.figure}} {{fields.words}}"
+                fields:
+                  - { label: "Figure", name: "figure", widget: "string",
+                      hint: "The number itself - it is drawn bright." }
+                  - { label: "Words after it", name: "words", widget: "string",
+                      hint: "The words that follow the figure, drawn quieter." }
+              - { label: "Small print underneath", name: "note", widget: "text", required: false }
+              - *buttons
+
+          # ------------------------------------------------------ banner ----
+          - label: "Photo banner"
+            name: "banner"
+            widget: "object"
+            summary: "Banner - {{fields.heading}}"
+            fields:
+              - *band
+              - { label: "Photo", name: "image", widget: "image", required: false,
+                  hint: "Wide crop. Leave empty and it falls back to a plain tone." }
+              - { label: "Photo description", name: "image_alt", widget: "string", required: false }
+              - *eyebrow
+              - { label: "Heading", name: "heading", widget: "string", required: false }
+              - { label: "Body", name: "body", widget: "text", required: false }
+              - *buttons
 
           # ------------------------------------------------ beforeafter ----
           - label: "Before & after"
