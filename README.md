@@ -2,9 +2,10 @@
 
 Starting point for a new client website: Jekyll + Cloudflare Pages + a
 [Sveltia CMS](https://github.com/sveltia/sveltia-cms) editor at `/admin/`,
-signed in through a per-client Cloudflare Worker (see
-[client-sites-auth](https://github.com/bcreates440/client-sites-auth) for the
-worker code to copy). Proven plumbing (layouts, the section-block system,
+signed in through a per-client Cloudflare Worker (code to copy:
+`ops/templates/cms-auth-worker.js`). No site has actually been hosted on
+Cloudflare Pages yet — everything live is on GitHub Pages as of 2026-09-23 —
+so treat step 8 as unverified the first time. Proven plumbing (layouts, the section-block system,
 `check.rb`) carried over from a live site; the content is placeholder text
 for you to replace.
 
@@ -34,7 +35,8 @@ for you to replace.
 7. Run `ruby check.rb` — must say `ALL CHECKS PASSED` before you push.
 8. `git push`, then connect the repo in Cloudflare (Workers & Pages →
    Create application → Pages → Connect to Git). Build command
-   `bundle exec jekyll build`, output directory `_site`.
+   `bundle exec jekyll build`, output directory `_site`. (If that first build
+   fails, GitHub Pages works as-is: repo Settings → Pages → deploy from `main`.)
 9. Add the client as a collaborator (**Settings → Collaborators → Add
    people**, **Write** access, not Admin) once they have a GitHub account
    with a verified email.

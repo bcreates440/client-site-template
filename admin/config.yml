@@ -16,10 +16,11 @@ backend:
   repo: OWNER/REPO
   branch: main
   # --- OAUTH LOGIN -------------------------------------------------------
-  # GitHub Pages cannot handle the login handshake by itself, so it is done
-  # by a small free service shared across every client site - see
-  # https://github.com/bcreates440/client-sites-auth
-  base_url: https://client-sites-auth.bcreates440.workers.dev
+  # The host cannot handle the login handshake by itself, so it is done by
+  # this client's own small worker - see ops/templates/onboarding.md,
+  # "CMS Auth Setup".
+  # TODO: set to https://<client-slug>-cms-auth.bcreates440.workers.dev
+  base_url: https://CLIENT-SLUG-cms-auth.bcreates440.workers.dev
   auth_endpoint: auth
   commit_messages:
     create: 'Add {{collection}} "{{slug}}"'
