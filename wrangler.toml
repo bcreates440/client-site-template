@@ -2,7 +2,8 @@
 #
 # The site is plain static files - this is NOT a server. Cloudflare's build
 # runs Jekyll on every push to main (build command:
-# `bundle install && bundle exec jekyll build`), then serves the finished
+# `bundle install && bundle exec jekyll build`, with build variables LANG and
+# LC_ALL set to C.UTF-8 in the dashboard), then serves the finished
 # _site folder. Commercial sites are allowed on Cloudflare's free tier;
 # GitHub Pages does not allow being used as hosting for a paid service,
 # which is why this moved here. See ops/design/hosting-decision.md.

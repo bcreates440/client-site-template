@@ -40,7 +40,10 @@ from a live site; the content is placeholder text for you to replace.
 8. `git push`. Then in the Cloudflare dashboard: **Workers & Pages → Create →
    Import a repository**, pick the new repo, and set the build command to
    `bundle install && bundle exec jekyll build` (leave the deploy command
-   as `npx wrangler deploy`). Every push to `main` now publishes. **Do not
+   as `npx wrangler deploy`). Under that Worker's **Settings → Build →
+   Variables and secrets**, add `LANG` = `C.UTF-8` and `LC_ALL` = `C.UTF-8`.
+   Without them the build fails on a Sass "Invalid US-ASCII character" error.
+   Every push to `main` now publishes. **Do not
    enable GitHub Pages** — it isn't allowed to be used as hosting for a paid
    service. Then add the site's `https://<repo>.bcreates440.workers.dev`
    origin (and later its real domain) to the client's auth worker's
