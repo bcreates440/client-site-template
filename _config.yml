@@ -1,7 +1,7 @@
 # ===========================================================================
 #  Jekyll settings
 #
-#  GitHub Pages reads this file and builds the site automatically every time
+#  Cloudflare reads this file and builds the site automatically every time
 #  you save a change. There is nothing to run yourself.
 # ===========================================================================
 
@@ -9,7 +9,7 @@
 # social-sharing tags that search engines read.
 #
 # IMPORTANT: leave this pointing at the real domain even while the site is
-# still being previewed at <owner>.github.io. It tells Google that the real
+# still being previewed at <repo>.<account>.workers.dev. It tells Google that the real
 # domain is the real address, which is what stops the preview copy competing
 # with the real site in search results.
 # TODO: set to the client's real domain
@@ -36,6 +36,7 @@ exclude:
   - Gemfile.lock
   - vendor
   - check.rb
+  - wrangler.toml
   - README.md
 
 # Keep the built output tidy and predictable.

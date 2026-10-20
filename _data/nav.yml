@@ -3,5 +3,5 @@
 # exist in _content/.
 items:
   - slug: index
-    url: index.html
+    url: ./
     label: Home
