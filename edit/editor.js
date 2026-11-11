@@ -1206,7 +1206,7 @@ function listPages() {
       // Google title ("About the WWCA | Wyoming Weapons..."). The home page's
       // title is usually a slogan; call it what it is.
       const home = d.permalink === "/" || d.permalink === "/index.html";
-      const title = home ? "Home page" : menuName(d) || String(d.title ?? "").split(" | ")[0] || path;
+      const title = home ? "Home page" : menuName(d) || withoutSiteName(String(d.title ?? "").split(" | ")[0]) || path;
       return { path, title, permalink: d.permalink, slug: d.slug };
     })
     .sort((a, b) => (isHomeEntry(a) ? -1 : isHomeEntry(b) ? 1 : a.title.localeCompare(b.title)));
@@ -1217,6 +1217,20 @@ function listPages() {
   $("page-select").value = state.current;
 }
 const isHomeEntry = (p) => p.permalink === "/" || p.permalink === "/index.html";
+
+// "Demo: annual event — Jones Uncommon" -> "Demo: annual event", but only when
+// the ending is exactly the site's own name; a dash inside a real title stays.
+function withoutSiteName(title) {
+  const names = [
+    (YAML.parse(state.files.get("_config.yml") ?? "") ?? {}).title,
+    (YAML.parse(state.files.get("_data/site.yml") ?? "") ?? {}).org_name,
+  ].filter(Boolean).map(String);
+  for (const n of names) {
+    const m = title.match(new RegExp(`^(.+?)\\s+[—–|-]\\s+${n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`));
+    if (m) return m[1];
+  }
+  return title;
+}
 
 // The label a page has in the site's menu, if it's in there.
 function menuName(page) {
