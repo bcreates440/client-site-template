@@ -1,0 +1,94 @@
+---
+permalink: /edit/index.html
+sitemap: false
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<!-- Only this site, the two pinned library CDNs and GitHub's API may run or be
+     contacted. The site preview inherits this policy and runs no scripts at
+     all (sandboxed iframe), so nothing in page content can reach the token. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com; connect-src 'self' https://api.github.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self'; base-uri 'self'; form-action 'none'">
+<title>Edit your website</title>
+{%- comment -%}
+  ?v= is the build time: every update gets fresh file names, so browsers
+  can't keep using an old copy. editor.js passes it on to the files it loads.
+{%- endcomment -%}
+{%- assign v = site.time | date: '%s' %}
+<link rel="stylesheet" href="editor.css?v={{ v }}">
+</head>
+<body>
+<a class="skip" href="#frame">Skip to the page</a>
+
+<header class="bar" id="bar" hidden>
+  <div class="bar-left">
+    <span class="site-name" id="site-name">Your website</span>
+    <label class="field-inline">
+      <span>Page</span>
+      <select id="page-select" aria-label="Page to edit"></select>
+    </label>
+    <button type="button" class="btn-quiet" id="page-settings">Page settings</button>
+    <button type="button" class="btn-tool" id="add-section">+ Add section</button>
+  </div>
+  <div class="bar-right">
+    <span class="saved" id="saved" role="status"></span>
+    <button type="button" class="btn-tool" id="undo" disabled aria-keyshortcuts="Control+Z">Undo</button>
+    <button type="button" class="btn-tool" id="redo" disabled aria-keyshortcuts="Control+Y">Redo</button>
+    <div class="seg" role="group" aria-label="Preview size">
+      <button type="button" id="view-desktop" aria-pressed="true">Computer</button>
+      <button type="button" id="view-mobile" aria-pressed="false">Phone</button>
+    </div>
+    <a class="btn-quiet" href="../admin/">Advanced editor</a>
+  </div>
+</header>
+
+<div class="notice" id="notice" role="alert" hidden>
+  <span id="notice-text"></span>
+  <button type="button" class="btn-primary" id="notice-keep">Bring them back</button>
+  <button type="button" class="btn-quiet" id="notice-discard">Start fresh</button>
+</div>
+
+<main class="stage" id="stage">
+  <section class="card-center" id="screen-signin" hidden>
+    <h1>Edit your website</h1>
+    <p>Sign in to make changes. You'll use the same GitHub account as before.</p>
+    <button type="button" class="btn-primary" id="signin">Sign in with GitHub</button>
+    <p class="error" id="signin-error" role="alert"></p>
+  </section>
+
+  <section class="card-center" id="screen-loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <p id="loading-text">Opening the editor&hellip;</p>
+  </section>
+
+  <div class="workspace" id="workspace" hidden>
+    <div class="frame-wrap" id="frame-wrap">
+      <iframe id="frame" title="Your page - click any words to change them" sandbox="allow-same-origin"></iframe>
+    </div>
+    <aside class="panel" id="panel" aria-labelledby="panel-title" hidden>
+      <div class="panel-head">
+        <h2 id="panel-title">Section</h2>
+        <button type="button" class="btn-tool" id="panel-close" aria-label="Close settings">Close</button>
+      </div>
+      <form class="panel-form" id="panel-form"></form>
+    </aside>
+  </div>
+</main>
+
+<dialog class="picker" id="picker" aria-labelledby="picker-title">
+  <div class="picker-head">
+    <h2 id="picker-title">Add a section</h2>
+    <button type="button" class="btn-tool" id="picker-close">Cancel</button>
+  </div>
+  <p class="picker-help">Pick one to add. It starts with example words and pictures for you to change.</p>
+  <div class="picker-grid" id="picker-grid"></div>
+</dialog>
+
+<p class="status" id="status" role="status" aria-live="polite"></p>
+
+<script type="module" src="editor.js?v={{ v }}"></script>
+</body>
+</html>

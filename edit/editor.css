@@ -1,0 +1,148 @@
+/* The editor's own look. The client's site is drawn inside the iframe, so
+   nothing here can leak into it, and nothing of the site's leaks out. */
+:root {
+  --ink: #1d2433;
+  --muted: #5b6475;
+  --line: #d9dde5;
+  --bg: #eef0f4;
+  --panel: #ffffff;
+  --accent: #2357d9;
+  --accent-ink: #ffffff;
+  --danger: #b42318;
+  --focus: #2357d9;
+  --radius: 10px;
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); display: flex; flex-direction: column; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+.skip { position: absolute; left: -999px; top: 0; background: var(--panel); padding: .5rem 1rem; z-index: 10; }
+.skip:focus { left: .5rem; top: .5rem; }
+
+/* --- top bar ------------------------------------------------------------ */
+.bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: .5rem 1rem; background: var(--panel); border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.bar-left, .bar-right { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.site-name { font-weight: 600; }
+.field-inline { display: flex; align-items: center; gap: .5rem; color: var(--muted); }
+select, button, .btn-quiet { font: inherit; min-height: 44px; }
+select { padding: 0 .75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--panel); color: var(--ink); padding: 0 1rem; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+button.btn-quiet { border: 0; background: none; cursor: pointer; }
+.btn-quiet { display: inline-flex; align-items: center; padding: 0 .75rem; color: var(--muted); text-decoration: underline; }
+.btn-primary {
+  border: 0; border-radius: 8px; background: var(--accent); color: var(--accent-ink);
+  padding: 0 1.25rem; font-weight: 600; cursor: pointer;
+}
+.btn-primary:hover { filter: brightness(1.08); }
+
+.btn-tool {
+  border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink);
+  padding: 0 .9rem; cursor: pointer;
+}
+.btn-tool:disabled { color: #8a92a3; cursor: default; }
+.saved { color: #1f7a3d; font-size: .9rem; }
+
+/* --- unpublished-changes notice ----------------------------------------- */
+.notice {
+  display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
+  padding: .5rem 1rem; background: #fff7e0; border-bottom: 1px solid #f0d68a;
+}
+
+/* --- the page preview ---------------------------------------------------- */
+.stage { flex: 1; display: flex; justify-content: center; overflow: hidden; min-height: 0; }
+.workspace { flex: 1; display: flex; min-width: 0; }
+.frame-wrap { flex: 1; min-width: 0; display: flex; justify-content: center; }
+.frame-wrap iframe { width: 100%; height: 100%; border: 0; background: #fff; }
+.frame-wrap.mobile { padding: 1rem 0; }
+.frame-wrap.mobile iframe { width: 390px; border-radius: 24px; box-shadow: 0 0 0 10px var(--ink); }
+
+/* --- settings panel ------------------------------------------------------ */
+.panel {
+  width: min(380px, 100%); flex: none; display: flex; flex-direction: column;
+  background: var(--panel); border-left: 1px solid var(--line); min-height: 0;
+}
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .75rem 1rem; border-bottom: 1px solid var(--line); }
+.panel-head h2 { margin: 0; font-size: 1.1rem; }
+.panel-form { overflow-y: auto; overflow-x: hidden; padding: 1rem; }
+.field { margin-bottom: 1rem; }
+.field > label { display: block; font-weight: 600; margin-bottom: .25rem; }
+.field .req { color: var(--danger); }
+.field input[type="text"], .field input[type="number"], .field textarea, .field select {
+  width: 100%; font: inherit; padding: .55rem .65rem; border: 1px solid #b9bfcc; border-radius: 8px; color: var(--ink); background: #fff;
+}
+.field textarea { resize: vertical; }
+.field.check { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.field.check input { width: 22px; height: 22px; }
+.field.check label { font-weight: 600; }
+.hint { margin: .3rem 0 0; color: var(--muted); font-size: .875rem; width: 100%; }
+/* min-width:0 - a fieldset otherwise refuses to shrink below its widest line. */
+.group { min-width: 0; border: 1px solid var(--line); border-radius: 8px; padding: .5rem .75rem .75rem; margin: 0 0 1rem; }
+.group legend { font-weight: 600; padding: 0 .25rem; }
+.item { border: 1px solid var(--line); border-radius: 8px; margin-bottom: .5rem; background: #fafbfc; }
+.item > summary { padding: .6rem .75rem; cursor: pointer; min-height: 44px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item-body { padding: .25rem .75rem .75rem; }
+.item.simple { padding: .5rem .75rem; }
+.item-tools { display: flex; flex-wrap: wrap; gap: .4rem; }
+.item-tools button, .add {
+  font: inherit; font-size: .875rem; min-height: 36px; padding: 0 .65rem; border: 1px solid var(--line);
+  border-radius: 6px; background: #fff; color: var(--ink); cursor: pointer;
+}
+.item-tools button:disabled { color: #8a92a3; cursor: default; }
+.item-tools .danger { color: var(--danger); }
+.add { width: 100%; min-height: 44px; border-style: dashed; color: var(--accent); }
+
+.locked { color: var(--muted); background: #f4f5f8; border-radius: 8px; padding: .75rem 1rem; }
+
+/* --- add-a-section picker ------------------------------------------------ */
+.picker { width: min(960px, calc(100vw - 2rem)); max-height: calc(100vh - 2rem); border: 0; border-radius: var(--radius); padding: 0; box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+.picker::backdrop { background: rgba(20, 25, 35, .55); }
+.picker-head { position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; background: var(--panel); border-bottom: 1px solid var(--line); z-index: 1; }
+.picker-head h2 { margin: 0; font-size: 1.25rem; }
+.picker-help { margin: 1rem 1.25rem 0; color: var(--muted); }
+.picker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; padding: 1rem 1.25rem 1.25rem; }
+.pick { display: flex; flex-direction: column; gap: .5rem; padding: .5rem; border: 2px solid var(--line); border-radius: var(--radius); background: var(--panel); color: var(--ink); font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
+.pick:hover { border-color: var(--accent); }
+.pick .thumb { position: relative; height: 160px; overflow: hidden; border-radius: 6px; background: #f4f5f8; }
+/* The preview is drawn at desktop width and shrunk to fit. */
+.pick iframe { position: absolute; top: 0; left: 0; width: 1200px; height: 800px; border: 0; transform: scale(.21); transform-origin: 0 0; pointer-events: none; }
+
+@media (max-width: 800px) {
+  /* On a phone the preview already is phone-sized; the switch is only for
+     checking the phone view from a computer. */
+  .seg { display: none; }
+  .workspace { flex-direction: column; }
+  .panel { width: 100%; max-height: 50%; border-left: 0; border-top: 1px solid var(--line); }
+}
+
+/* --- sign-in and loading ------------------------------------------------- */
+.card-center {
+  align-self: center; max-width: 28rem; margin: 1rem; padding: 2rem;
+  background: var(--panel); border-radius: var(--radius); text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+}
+.card-center h1 { margin: 0 0 .5rem; font-size: 1.5rem; }
+.card-center p { color: var(--muted); }
+.error { color: var(--danger) !important; min-height: 1.5em; }
+.spinner {
+  width: 36px; height: 36px; margin: 0 auto 1rem; border-radius: 50%;
+  border: 4px solid var(--line); border-top-color: var(--accent); animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- announcements ------------------------------------------------------- */
+.status {
+  position: fixed; left: 50%; bottom: 1rem; transform: translateX(-50%); margin: 0;
+  background: var(--ink); color: #fff; padding: .5rem 1rem; border-radius: 999px;
+}
+.status:empty { display: none; }

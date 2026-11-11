@@ -44,7 +44,9 @@ sitemap: false
   // gives back the same data).
   window.CMS_MANUAL_INIT = true;
 </script>
-<script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+<!-- ponytail: pinned so a Sveltia release can't change every client's editor
+     overnight. Bump on purpose, then test a save round-trip. -->
+<script src="https://unpkg.com/@sveltia/cms@0.253.1/dist/sveltia-cms.js"></script>
 <script type="module">
   import YAML from "https://unpkg.com/yaml@2.9.1/browser/index.js";
 
