@@ -32,6 +32,7 @@ sitemap: false
     </label>
     <button type="button" class="btn-quiet" id="page-settings">Page settings</button>
     <button type="button" class="btn-tool" id="add-section">+ Add section</button>
+    <select id="site-select" aria-label="Edit details used on every page" hidden></select>
   </div>
   <div class="bar-right">
     <span class="saved" id="saved" role="status"></span>
@@ -85,6 +86,38 @@ sitemap: false
   </div>
   <p class="picker-help">Pick one to add. It starts with example words and pictures for you to change.</p>
   <div class="picker-grid" id="picker-grid"></div>
+</dialog>
+
+<dialog class="modal" id="newpage" aria-labelledby="newpage-heading">
+  <form id="newpage-form">
+    <h2 id="newpage-heading">Add a page</h2>
+    <div class="field">
+      <label for="newpage-title">Page name</label>
+      <input type="text" id="newpage-title" autocomplete="off" aria-describedby="newpage-title-hint">
+      <p class="hint" id="newpage-title-hint">This is what shows in the browser tab and the menu. You can change it later.</p>
+    </div>
+    <div class="field">
+      <label for="newpage-from">Start with</label>
+      <select id="newpage-from"></select>
+    </div>
+    <div class="field check">
+      <input type="checkbox" id="newpage-menu">
+      <label for="newpage-menu">Put it in the menu</label>
+    </div>
+    <p class="error" id="newpage-error" role="alert"></p>
+    <div class="modal-actions">
+      <button type="submit" class="btn-primary">Add page</button>
+      <button type="button" class="btn-tool" id="newpage-cancel">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="modal" id="confirm" aria-labelledby="confirm-text">
+  <p id="confirm-text"></p>
+  <div class="modal-actions">
+    <button type="button" class="btn-danger" id="confirm-yes">Delete</button>
+    <button type="button" class="btn-tool" id="confirm-no">Keep it</button>
+  </div>
 </dialog>
 
 <p class="status" id="status" role="status" aria-live="polite"></p>

@@ -102,6 +102,29 @@ button.btn-quiet { border: 0; background: none; cursor: pointer; }
 .item-tools .danger { color: var(--danger); }
 .add { width: 100%; min-height: 44px; border-style: dashed; color: var(--accent); }
 
+/* --- pictures, Google preview, danger button ---------------------------- */
+.media { display: flex; flex-direction: column; align-items: flex-start; gap: .5rem; }
+.media img { max-width: 100%; max-height: 160px; border-radius: 6px; border: 1px solid var(--line); object-fit: contain; background: #f4f5f8; }
+.btn-danger {
+  font: inherit; min-height: 44px; padding: 0 1rem; border: 1px solid #e4b4ae; border-radius: 8px;
+  background: #fff; color: var(--danger); cursor: pointer;
+}
+.panel-form > .btn-danger { margin-top: .5rem; }
+.google { border: 1px solid var(--line); border-radius: 8px; padding: .75rem; margin-bottom: 1rem; background: #fff; }
+.google p { margin: 0; overflow-wrap: anywhere; }
+.google-label { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: .4rem !important; }
+.google-url { color: #1e6b33; font-size: .85rem; }
+.google-title { color: #1a0dab; font-size: 1.15rem; line-height: 1.3; }
+.google-desc { color: #474747; font-size: .9rem; margin-bottom: .5rem !important; }
+#site-select { max-width: 12rem; }
+
+/* --- small dialogs -------------------------------------------------------- */
+.modal { width: min(30rem, calc(100vw - 2rem)); border: 0; border-radius: var(--radius); padding: 1.25rem; box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+.modal::backdrop { background: rgba(20, 25, 35, .55); }
+.modal h2 { margin: 0 0 1rem; font-size: 1.25rem; }
+.modal .field input[type="text"], .modal .field select { width: 100%; font: inherit; padding: .55rem .65rem; border: 1px solid #b9bfcc; border-radius: 8px; }
+.modal-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1rem; }
+
 .locked { color: var(--muted); background: #f4f5f8; border-radius: 8px; padding: .75rem 1rem; }
 
 /* --- add-a-section picker ------------------------------------------------ */

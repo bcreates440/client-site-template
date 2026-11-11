@@ -73,7 +73,7 @@ export function drawForm(root, fields, value, path, ctx) {
   root.replaceChildren(...fields.filter((f) => f.widget !== "hidden").map((f) => field(f, value?.[f.name], [...path, f.name], ctx)));
 }
 
-function labelled(def, path, control, ctx) {
+export function labelled(def, path, control, ctx) {
   const id = `f${++uid}`;
   control.id = id;
   control.dataset.path = JSON.stringify(path);
@@ -91,8 +91,49 @@ const hasTags = (s) => /<[a-z/][^>]*>/i.test(s ?? "");
 const toWords = (s) => { const t = document.createElement("textarea"); t.innerHTML = s ?? ""; return t.value; };
 const toHtml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-function field(def, value, path, ctx) {
+// "Goes to": pick a page or a named link instead of typing an address.
+function linkField(def, value, path, ctx) {
+  const v = value ?? "";
+  const named = ctx.links(); // [{ label, value }] - this site's pages and link words
+  const kinds = [
+    ...named.map((o) => ({ ...o, kind: "named" })),
+    { label: "A web address…", value: "web", kind: "web" },
+    { label: "An email address…", value: "mailto", kind: "mailto" },
+    { label: "A phone number…", value: "tel", kind: "tel" },
+  ];
+  const now = named.find((o) => o.value === v) ? v : v.startsWith("mailto:") ? "mailto" : v.startsWith("tel:") ? "tel" : "web";
+  const sel = h("select", {}, kinds.map((k) => new Option(k.label, k.value)));
+  sel.value = now;
+  const box = h("input", { type: "text", "aria-label": "Address" });
+  const show = (kind) => {
+    box.hidden = !["web", "mailto", "tel"].includes(kind);
+    box.placeholder = kind === "mailto" ? "name@example.com" : kind === "tel" ? "(307) 555-0100" : "https://…";
+    box.value = kind === "mailto" ? v.replace(/^mailto:/, "") : kind === "tel" ? v.replace(/^tel:/, "") : kind === "web" && !named.some((o) => o.value === v) ? v : "";
+  };
+  const fromBox = () => {
+    const t = box.value.trim();
+    if (sel.value === "mailto") return `mailto:${t}`;
+    if (sel.value === "tel") return `tel:${t.replace(/[^\d+]/g, "")}`;
+    return t;
+  };
+  sel.onchange = () => {
+    show(sel.value);
+    if (box.hidden) ctx.set(path, sel.value);
+    else { box.focus(); if (box.value) ctx.set(path, fromBox()); }
+  };
+  box.oninput = () => ctx.set(path, fromBox());
+  show(now);
+  // The field's hint explains what to type in the backup editor's text box;
+  // with a list to pick from it only confuses, so it's left off here.
+  const wrap = labelled({ ...def, label: def.label ?? "Goes to", hint: undefined }, path, sel, ctx);
+  wrap.querySelector("select").after(box);
+  return wrap;
+}
+
+export function field(def, value, path, ctx) {
   const set = (v) => ctx.set(path, v);
+  if ((def.widget === "image" || def.widget === "file") && ctx.media) return ctx.media(def, value, path, labelled);
+  if (def.name === "url" && (def.widget ?? "string") === "string" && ctx.links) return linkField(def, value, path, ctx);
   const asWords = typeof value === "string" && !hasTags(value) && def.widget !== "markdown";
   const shown = asWords ? toWords(value) : value ?? "";
   const setText = (v) => set(asWords ? toHtml(v) : v);
@@ -130,7 +171,9 @@ function field(def, value, path, ctx) {
 
 function list(def, items, path, ctx) {
   const itemDef = def.fields ? { widget: "object", fields: def.fields } : def.field ?? { widget: "string", label: def.label_singular ?? "Item" };
-  const name = (def.label_singular ?? def.label ?? "item").toLowerCase().replace(/s$/, "");
+  // "Buttons" -> "+ Add button"; a name that isn't a plural -> "+ Add another".
+  const plural = def.label ?? "";
+  const name = def.label_singular?.toLowerCase() ?? (/[^s]s$/i.test(plural) ? plural.toLowerCase().slice(0, -1) : "another");
   const rows = items.map((item, i) => {
     const p = [...path, i];
     const tools = h("div", { className: "item-tools" },

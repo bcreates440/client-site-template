@@ -90,6 +90,29 @@ export function mapDom(doc, fields) {
   return { spots };
 }
 
+/**
+ * Ties each picture on screen to its field, using the probe render from
+ * fields.js. The probe and the preview are the same page with different
+ * picture names, so the k-th <img src> in one is the k-th <img src> in the
+ * other. Sets data-ed-img="i" (i = index into the picture paths).
+ */
+export function mapImages(doc, probeHtml) {
+  const probe = new DOMParser().parseFromString(probeHtml, "text/html");
+  const ATTRS = ["src", "poster", "data-full"];
+  for (const attr of ATTRS) {
+    const sel = `[${attr}]`;
+    const real = [...doc.body.querySelectorAll(sel)].filter((el) => !el.closest(".ed-bar"));
+    [...probe.body.querySelectorAll(sel)].forEach((el, k) => {
+      const m = el.getAttribute(attr).match(/__edimg(\d+)__/);
+      const r = real[k];
+      if (!m || !r || r.tagName !== el.tagName) return; // pages differ: leave it to the panel
+      // <source> sits inside a <video>: the video is what gets clicked.
+      const target = r.tagName === "SOURCE" ? r.parentElement : r;
+      if (!target.hasAttribute("data-ed-img")) target.setAttribute("data-ed-img", m[1]);
+    });
+  }
+}
+
 // ------------------------------------------------------------ text <-> value
 const ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;" };
 export const escapeText = (s) => s.replace(/[&<>]/g, (c) => ESC[c]);

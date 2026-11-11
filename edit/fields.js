@@ -58,6 +58,20 @@ function withSentinels(data) {
 // Field paths refer to the real blocks; with sentinels each block i sits at 2i+1.
 const shift = (path) => (path[0] === "blocks" ? ["blocks", path[1] * 2 + 1, ...path.slice(2)] : path);
 
+// Every text value's path in the page (for finding picture fields).
+export const valuePaths = (data) => [...leaves(data)];
+
+// Pictures can't carry markers (the site looks them up by name), so instead
+// each picture value is swapped for a made-up name, __edimg<i>__, in one
+// extra render. Every site's picture lookup passes unknown names straight
+// through, so the made-up name shows up in exactly the attributes (src,
+// poster, data-full...) where that picture is used.
+export async function probeImages(render, data, paths) {
+  const d = withSentinels(data);
+  paths.forEach((p, i) => setPath(d, shift(p), `__edimg${i}__`));
+  return render(d);
+}
+
 /**
  * render(data) -> html for one page.
  * unsafe: a Set of patterns already known to break when marked (shared
