@@ -1,0 +1,18 @@
+{%- comment -%}
+  Big number - one flowing statement in which the figures read bright and the
+  words around them sit back. Built for a single claim made of several numbers,
+  not for a row of separate stats (that is the `stats` block).
+{%- endcomment -%}
+{%- assign band = b.band | default: 'navy' -%}
+<section class="band-{{ band }} bignumber-section">
+  <div class="wrap center">
+    {%- if b.eyebrow %}<p class="eyebrow">{{ b.eyebrow }}</p>{% endif -%}
+    <p class="bignumber">
+      {%- for it in b.items -%}
+        <b>{{ it.figure }}</b> <span>{{ it.words }}</span>{% unless forloop.last %}&#32;{% endunless %}
+      {%- endfor -%}
+    </p>
+    {%- if b.note %}<p class="btn-note">{{ b.note }}</p>{% endif -%}
+    {%- if b.buttons %}{% include blocks/buttons.html buttons=b.buttons %}{% endif -%}
+  </div>
+</section>

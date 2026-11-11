@@ -1,0 +1,19 @@
+{%- comment -%}
+  Banner - a wide photo panel with the words held to one side. Falls back to a
+  tonal panel when no image is set, same as `showcase`.
+{%- endcomment -%}
+{%- assign band = b.band | default: 'paper' -%}
+<section class="band-{{ band }}">
+  <div class="wrap">
+    <div class="banner{% unless b.image %} sc-tonal{% endunless %}"
+         {% if b.image %}style="background-image:url('{{ b.image }}')"{% endif %}
+         {% if b.image_alt %}role="img" aria-label="{{ b.image_alt }}"{% endif %}>
+      <div class="banner-inner">
+        {%- if b.eyebrow %}<p class="eyebrow">{{ b.eyebrow }}</p>{% endif -%}
+        {%- if b.heading %}<h2>{% include md.html text=b.heading inline=true %}</h2>{% endif -%}
+        {%- if b.body %}<p>{% include md.html text=b.body inline=true %}</p>{% endif -%}
+        {%- if b.buttons %}{% include blocks/buttons.html buttons=b.buttons %}{% endif -%}
+      </div>
+    </div>
+  </div>
+</section>

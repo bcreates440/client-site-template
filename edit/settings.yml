@@ -1,0 +1,8 @@
+# Extras for the website editor at /edit/ that only this site needs.
+# (Everything else - repo, sign-in, sections, fields - is in admin/config.yml.)
+
+# Cloudflare serves contact.html at /contact, and every link, menu entry and
+# sitemap address is written that way (check.rb insists). The editor writes
+# new ones the same way. Delete this line for a site hosted where links keep
+# their .html.
+page_links: extensionless

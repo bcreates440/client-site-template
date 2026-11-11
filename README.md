@@ -1,15 +1,14 @@
 # client-site-template
 
-Starting point for a new client website: Jekyll + Cloudflare Pages + a
-click-to-edit website editor at `/edit/` (with
-[Sveltia CMS](https://github.com/sveltia/sveltia-cms) at `/admin/` as the
-advanced editor),
+Starting point for a new client website: Jekyll, hosted on Cloudflare
+(Workers static assets, built from this repo on every push) + a click-to-edit
+website editor at `/edit/` (with [Sveltia CMS](https://github.com/sveltia/sveltia-cms)
+at `/admin/` as the advanced editor), both
 signed in through a per-client Cloudflare Worker (code to copy:
-`ops/templates/cms-auth-worker.js`). No site has actually been hosted on
-Cloudflare Pages yet — everything live is on GitHub Pages as of 2026-09-23 —
-so treat step 8 as unverified the first time. Proven plumbing (layouts, the section-block system,
-`check.rb`) carried over from a live site; the content is placeholder text
-for you to replace.
+`ops/templates/cms-auth-worker.js`). Not GitHub Pages: it isn't allowed to be
+used as hosting for a paid service (see `ops/design/hosting-decision.md`).
+Proven plumbing (layouts, the section-block system, `check.rb`) carried over
+from a live site; the content is placeholder text for you to replace.
 
 ## Spin up a new client site
 
@@ -23,8 +22,12 @@ for you to replace.
    - `backend.base_url`: the client's own `<slug>-cms-auth` worker URL from
      step 0 — not the shared worker
    - `site_url` / `display_url`: the client's real domain (or the
-     `*.pages.dev` URL for now)
-3. Edit `_config.yml`: set `url`, `title`, `description`.
+     `<repo>.bcreates440.workers.dev` URL for now)
+3. Edit `_config.yml`: set `url`, `title`, `description`. Edit
+   `wrangler.toml`: set `name` to the repo name. Update the `example.com`
+   addresses in `sitemap.xml` and `robots.txt`. Sitemap entries and links are
+   extensionless (`/contact`, not `/contact.html`), because the host serves
+   pages that way. `check.rb` expects it.
 4. Edit `_data/site.yml`: the real org name, contact info, socials, and
    `theme_color` (match it to `--brand` — a `<meta>` tag can't read a CSS
    variable, so it's the one colour stated twice).
@@ -35,10 +38,17 @@ for you to replace.
    or update the references in `_includes/header.html`,
    `_includes/footer.html` and `admin/config.yml`'s `logo_url`).
 7. Run `ruby check.rb` — must say `ALL CHECKS PASSED` before you push.
-8. `git push`, then connect the repo in Cloudflare (Workers & Pages →
-   Create application → Pages → Connect to Git). Build command
-   `bundle exec jekyll build`, output directory `_site`. (If that first build
-   fails, GitHub Pages works as-is: repo Settings → Pages → deploy from `main`.)
+8. `git push`. Then in the Cloudflare dashboard: **Workers & Pages → Create →
+   Import a repository**, pick the new repo, and set the build command to
+   `bundle install && bundle exec jekyll build` (leave the deploy command
+   as `npx wrangler deploy`). Under that Worker's **Settings → Build →
+   Variables and secrets**, add `LANG` = `C.UTF-8` and `LC_ALL` = `C.UTF-8`.
+   Without them the build fails on a Sass "Invalid US-ASCII character" error.
+   Every push to `main` now publishes. **Do not
+   enable GitHub Pages** — it isn't allowed to be used as hosting for a paid
+   service. Then add the site's `https://<repo>.bcreates440.workers.dev`
+   origin (and later its real domain) to the client's auth worker's
+   `ALLOWED_ORIGINS`, or editor sign-in hangs.
 9. Add the client as a collaborator (**Settings → Collaborators → Add
    people**, **Write** access, not Admin) once they have a GitHub account
    with a verified email.

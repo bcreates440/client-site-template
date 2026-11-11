@@ -101,7 +101,8 @@ if Dir.exist?(SITE)
   gone.empty? ? ok("all #{imgs.size} referenced images exist") : gone.each { |i| bad "missing image #{i}" }
 
   links = Set.new
-  built.each { |f| File.read(f, encoding: "utf-8").scan(/href="([a-z0-9_-]+\.html)(?:#[^"]*)?"/) { links << $1 } }
+  # Pages are linked extensionless ("contact"); the host serves contact.html there.
+  built.each { |f| File.read(f, encoding: "utf-8").scan(/href="([a-z0-9_-]+)(?:\.html)?(?:#[^"]*)?"/) { links << "#{$1}.html" } }
   dead = links.reject { |l| File.exist?(File.join(SITE, l)) }
   dead.empty? ? ok("all #{links.size} internal links resolve") : dead.each { |l| bad "link to a page that does not exist: #{l}" }
 
@@ -125,7 +126,9 @@ if Dir.exist?(SITE)
     xml = File.read("sitemap.xml", encoding: "utf-8")
     built.each do |f|
       name = File.basename(f)
-      bad "#{name} is not listed in sitemap.xml" unless xml.include?(name)
+      # Listed by clean address: the homepage as "/", every other page without .html.
+      clean = name == "index.html" ? "/</loc>" : "/#{name.delete_suffix('.html')}</loc>"
+      bad "#{name} is not listed in sitemap.xml" unless xml.include?(clean)
     end
   end
 else

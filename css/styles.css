@@ -116,6 +116,14 @@ hr{border:0;border-top:1px solid var(--line);margin:2.5rem 0}
 .btn-ghost:hover{background:rgba(255,255,255,.14);color:var(--on-dark)}
 .btn-outline{background:transparent;color:var(--navy);border-color:var(--navy)}
 .btn-outline:hover{background:var(--navy);color:var(--on-dark)}
+/* An outline button is navy-on-transparent, which vanishes on the dark overlay
+   inside a banner, a showcase panel or the hero. Same light-on-dark trap the
+   band-navy rules guard against - add any new dark surface to this list. */
+.banner .btn-outline,.sc-narrow .btn-outline,.sc-wide .btn-outline,.hero .btn-outline{
+  color:var(--on-dark);border-color:var(--on-dark)}
+.banner .btn-outline:hover,.sc-narrow .btn-outline:hover,
+.sc-wide .btn-outline:hover,.hero .btn-outline:hover{
+  background:var(--on-dark);color:var(--ink)}
 .btn-row{display:flex;flex-wrap:wrap;gap:.8rem}
 .btn-row.center{justify-content:center}
 .btn-note{font-size:.9rem;color:var(--ink-soft);margin:.8rem 0 0}
@@ -282,6 +290,10 @@ tbody tr:nth-child(even){background:var(--stripe)}
 .band-navy .testimonial figcaption span{color:var(--ink-soft)}
 .band-navy .stars{color:var(--red)}
 
+/* One real testimonial is the normal starting point for a new client, and a
+   lone card stranded in a 3-up grid reads as unfinished. Centre it instead. */
+.testimonials .grid > .testimonial:only-child{max-width:36rem;margin-inline:auto}
+
 /* ---------- FAQ ---------- */
 .faq details{border-bottom:1px solid var(--line);padding:1.1rem 0}
 .faq details:first-child{border-top:1px solid var(--line)}
@@ -299,6 +311,55 @@ tbody tr:nth-child(even){background:var(--stripe)}
 .trustbar{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 2.2rem;
   list-style:none;margin:0;padding:0;text-align:center;
   font-family:var(--ui);text-transform:uppercase;letter-spacing:.05em;font-size:.86rem}
+
+/* ---------- SHOWCASE (narrow panel + wide panel) ----------
+   Two photo panels side by side: a narrower one carrying an overlaid heading
+   and a small floating detail card, and a wider one. Either panel falls back
+   to a plain tone when no photo is set, so the block is safe to place before
+   the photography arrives - unlike `split`, which renders a broken image. */
+.showcase{display:grid;grid-template-columns:1fr 2fr;gap:1.1rem}
+.sc-narrow,.sc-wide{position:relative;min-height:clamp(20rem,38vw,27rem);
+  background-size:cover;background-position:center;border-radius:var(--radius);
+  overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;
+  padding:1.6rem}
+.sc-narrow::after,.sc-wide::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(var(--hero-veil),.55),rgba(var(--hero-veil),.15) 45%,rgba(var(--hero-veil),.35))}
+.sc-tonal{background-image:none;background-color:var(--brand-deep)}
+.sc-narrow > *,.sc-wide > *{position:relative;z-index:1}
+.sc-eyebrow{color:var(--accent-pale)}
+.sc-heading{color:var(--on-dark);font-size:clamp(1.3rem,2.3vw,1.85rem);
+  text-transform:var(--display-case);margin:0}
+.sc-card{background:var(--paper);border-radius:var(--radius);padding:.85rem 1rem;
+  align-self:flex-start;max-width:19rem;box-shadow:var(--shadow)}
+.sc-card b{display:block;font-size:.92rem;color:var(--ink);line-height:1.3}
+.sc-card span{display:block;font-size:.86rem;color:var(--ink-soft);margin-top:.15rem}
+.sc-card .sc-note{color:var(--accent);font-weight:600}
+.sc-widetext{color:var(--on-dark);align-self:flex-end;margin:0;
+  font-family:var(--ui);text-transform:uppercase;letter-spacing:.09em;font-size:.8rem}
+
+/* ---------- BIG NUMBER STATEMENT ----------
+   One claim made of several figures, the numbers bright and the words around
+   them held back. For a row of separate figures use `stats` instead. */
+.bignumber-section{padding-block:clamp(2.8rem,6vw,4.4rem)}
+.bignumber{font-family:var(--display);font-weight:var(--display-weight);
+  text-transform:var(--display-case);letter-spacing:-.015em;line-height:1.18;
+  font-size:clamp(1.5rem,3.6vw,2.6rem);max-width:58rem;margin:0 auto}
+.bignumber b{color:var(--on-dark)}
+.bignumber span{color:var(--on-brand-soft)}
+.band-paper .bignumber b,.band-cream .bignumber b{color:var(--ink)}
+.band-paper .bignumber span,.band-cream .bignumber span{color:var(--ink-soft)}
+
+/* ---------- PHOTO BANNER ---------- */
+.banner{position:relative;border-radius:var(--radius);overflow:hidden;
+  background-size:cover;background-position:center;
+  min-height:clamp(16rem,26vw,20rem);display:flex;align-items:center}
+.banner::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(var(--hero-veil),.86),rgba(var(--hero-veil),.35))}
+.banner-inner{position:relative;z-index:1;padding:clamp(1.6rem,4vw,2.8rem);max-width:34rem}
+.banner-inner h2{color:var(--on-dark);margin-bottom:.5rem}
+.banner-inner p{color:var(--on-brand)}
+.banner-inner .eyebrow{color:var(--accent-pale)}
+.banner-inner .btns{justify-content:flex-start;margin-top:1.2rem}
 
 /* ---------- BEFORE / AFTER ---------- */
 .beforeafter{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1.6rem}
@@ -365,7 +426,18 @@ tbody tr:nth-child(even){background:var(--stripe)}
   font-size:.86rem;color:var(--on-brand-faint)}
 
 /* ---------- RESPONSIVE ---------- */
+/* A two-column price table is min-width:460px inside a ~350px wrapper on a
+   phone, which pushes the price column off-screen behind a horizontal scroll.
+   On the narrowest screens let it shrink to fit and pin the figure right.
+   Tables with more columns still overflow and scroll, which is correct. */
+@media (max-width:560px){
+  table{min-width:0}
+  th,td{padding:.7rem .55rem}
+  th:last-child,td:last-child{text-align:right;white-space:nowrap}
+}
+
 @media (max-width:980px){
+  .showcase{grid-template-columns:1fr}
   .g4,.stats,.people{grid-template-columns:repeat(2,1fr)}
   .fgrid{grid-template-columns:repeat(2,1fr)}
   .split{grid-template-columns:1fr;gap:1.6rem}

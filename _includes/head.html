@@ -4,18 +4,20 @@
   _content/, so each page keeps its own title, description and share text.
 {%- endcomment -%}
 {%- assign s = site.data.site -%}
+{%- comment -%} The host serves /work.html at /work, and the homepage at /. {%- endcomment -%}
+{%- assign clean = page.permalink | remove: '.html' | replace: '/index', '/' -%}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{ page.title }}</title>
 <meta name="description" content="{{ page.description }}">
-<link rel="canonical" href="{{ site.url }}{{ page.permalink }}">
+<link rel="canonical" href="{{ site.url }}{{ clean }}">
 <meta name="theme-color" content="{{ s.theme_color }}">
 <link rel="icon" href="images/logo.png" type="image/png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ s.org_name }}">
 <meta property="og:title" content="{{ page.og_title | default: page.title }}">
 <meta property="og:description" content="{{ page.og_description | default: page.description }}">
-<meta property="og:url" content="{{ site.url }}{{ page.permalink }}">
+<meta property="og:url" content="{{ site.url }}{{ clean }}">
 <meta property="og:image" content="{{ site.url }}/{{ s.share_image }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ page.tw_title | default: page.title }}">
