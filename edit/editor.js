@@ -1313,7 +1313,10 @@ async function open() {
   try {
     loading("Loading your website…");
     await loadFiles();
-    state.render = makeRenderer({ Liquid, Marked, YAML, files: state.files });
+    // The editor always lives at <site>/edit/, so the sub-folder the site is
+    // really served from is the editor's own folder, one level up.
+    const baseurl = new URL(SITE_ROOT).pathname.replace(/\/$/, "");
+    state.render = makeRenderer({ Liquid, Marked, YAML, files: state.files, baseurl });
     state.current = "";
     listPages();
     $("site-select").replaceChildren(new Option("Site-wide…", ""), ...state.dataFiles.map((d) => new Option(d.label, d.file)));

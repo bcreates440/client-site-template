@@ -93,7 +93,7 @@ function makeMarkdown(Marked) {
  *   data (optional) overrides the page's front matter, so the editor can
  *   render its unsaved in-memory copy.
  */
-export function makeRenderer({ Liquid, Marked, YAML, files, now = new Date() }) {
+export function makeRenderer({ Liquid, Marked, YAML, files, now = new Date(), baseurl }) {
   const markdownify = makeMarkdown(Marked);
   const read = (p) => {
     const t = files.get(p);
@@ -126,6 +126,10 @@ export function makeRenderer({ Liquid, Marked, YAML, files, now = new Date() }) 
     Number.isInteger(+a) && Number.isInteger(+b) ? Math.floor(a / b) : a / b);
 
   const config = YAML.parse(read("_config.yml")) ?? {};
+  // The host can build the site under a different sub-folder than
+  // _config.yml says (Montaire's Cloudflare copy overrides it to ""), so the
+  // editor passes the one it's actually being served under.
+  if (baseurl != null) config.baseurl = baseurl;
   // Jekyll's URL filters, for sites served from a sub-folder (baseurl).
   const relativeUrl = (s) => {
     s = s == null ? "" : String(s);
