@@ -853,7 +853,7 @@ function usedUploads() {
 }
 
 function publishDialog(...content) {
-  $("publish-body").replaceChildren(...content);
+  $("publish-body").replaceChildren(...content.filter((c) => c != null)); // optional parts are passed as null
   if (!$("publish").open) $("publish").showModal();
 }
 const closeBtn = (text = "Close") => el("button", { type: "button", className: "btn-tool", textContent: text, onclick: () => $("publish").close() });
@@ -1202,9 +1202,12 @@ function listPages() {
     .filter((p) => p.startsWith("_content/"))
     .map((path) => {
       const d = splitFrontMatter(state.files.get(path), YAML).data;
-      // The home page's title is usually a slogan; call it what it is.
+      // Name pages the way the site's own menu does ("About"), not by their
+      // Google title ("About the WWCA | Wyoming Weapons..."). The home page's
+      // title is usually a slogan; call it what it is.
       const home = d.permalink === "/" || d.permalink === "/index.html";
-      return { path, title: home ? "Home page" : d.title || path, permalink: d.permalink, slug: d.slug };
+      const title = home ? "Home page" : menuName(d) || String(d.title ?? "").split(" | ")[0] || path;
+      return { path, title, permalink: d.permalink, slug: d.slug };
     })
     .sort((a, b) => (isHomeEntry(a) ? -1 : isHomeEntry(b) ? 1 : a.title.localeCompare(b.title)));
   $("page-select").replaceChildren(
@@ -1214,6 +1217,20 @@ function listPages() {
   $("page-select").value = state.current;
 }
 const isHomeEntry = (p) => p.permalink === "/" || p.permalink === "/index.html";
+
+// The label a page has in the site's menu, if it's in there.
+function menuName(page) {
+  const nav = navEntry();
+  if (!nav || !state.files.has(nav.file)) return "";
+  const { path } = navList(nav);
+  const all = [];
+  const walk = (items) => (Array.isArray(items) ? items : []).forEach((it) => { all.push(it); walk(it?.children); });
+  walk(path.length ? dataOf(nav.file)?.[path[0]] : dataOf(nav.file));
+  const bare = (u) => String(u ?? "").replace(/^\.?\//, "").replace(/\.html$/, "").replace(/\/$/, "").split("#")[0];
+  const want = bare(page.permalink);
+  const hit = all.find((it) => (page.slug && it.slug === page.slug) || (it.url != null && !String(it.url).includes("#") && bare(it.url) === want));
+  return hit ? htmlToText(document, String(hit.label ?? hit.title ?? "")) : "";
+}
 
 // Picture fields on this page: every value whose field is an image.
 function imagePaths(data) {
