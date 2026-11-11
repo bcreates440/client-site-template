@@ -31,7 +31,6 @@ body { background: var(--bg); display: flex; flex-direction: column; }
   flex-wrap: wrap;
 }
 .bar-left, .bar-right { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
-.site-name { font-weight: 600; }
 .field-inline { display: flex; align-items: center; gap: .5rem; color: var(--muted); }
 select, button, .btn-quiet { font: inherit; min-height: 44px; }
 select { padding: 0 .75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); }
@@ -125,6 +124,18 @@ button.btn-quiet { border: 0; background: none; cursor: pointer; }
 .modal .field input[type="text"], .modal .field select { width: 100%; font: inherit; padding: .55rem .65rem; border: 1px solid #b9bfcc; border-radius: 8px; }
 .modal-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1rem; }
 
+.btn-primary:disabled { background: #9aa6c4; cursor: default; filter: none; }
+a.btn-primary { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; }
+.notice.history { background: #e8efff; border-bottom-color: #b9cbf5; }
+.modal .spinner { margin: 1rem auto; }
+.problems, .versions, .tips { padding-left: 1.25rem; }
+.problems li, .versions li { margin-bottom: .6rem; }
+.problems li, .versions li { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; justify-content: space-between; }
+.problems .btn-tool, .versions .btn-tool { min-height: 36px; }
+.versions { list-style: none; padding: 0; max-height: 50vh; overflow-y: auto; }
+.versions li { border-bottom: 1px solid var(--line); padding-bottom: .5rem; }
+.tips li { margin-bottom: .5rem; }
+
 .locked { color: var(--muted); background: #f4f5f8; border-radius: 8px; padding: .75rem 1rem; }
 
 /* --- add-a-section picker ------------------------------------------------ */
@@ -169,3 +180,6 @@ button.btn-quiet { border: 0; background: none; cursor: pointer; }
   background: var(--ink); color: #fff; padding: .5rem 1rem; border-radius: 999px;
 }
 .status:empty { display: none; }
+
+/* Read out by screen readers, not shown. */
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

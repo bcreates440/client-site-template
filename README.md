@@ -1,7 +1,9 @@
 # client-site-template
 
 Starting point for a new client website: Jekyll + Cloudflare Pages + a
-[Sveltia CMS](https://github.com/sveltia/sveltia-cms) editor at `/admin/`,
+click-to-edit website editor at `/edit/` (with
+[Sveltia CMS](https://github.com/sveltia/sveltia-cms) at `/admin/` as the
+advanced editor),
 signed in through a per-client Cloudflare Worker (code to copy:
 `ops/templates/cms-auth-worker.js`). No site has actually been hosted on
 Cloudflare Pages yet — everything live is on GitHub Pages as of 2026-09-23 —
@@ -40,9 +42,19 @@ for you to replace.
 9. Add the client as a collaborator (**Settings → Collaborators → Add
    people**, **Write** access, not Admin) once they have a GitHub account
    with a verified email.
-10. Open `/admin/`, sign in with GitHub, confirm a test save round-trips.
+10. Open `/edit/`, sign in with GitHub, change one word, Publish, and confirm
+    it shows on the live site a minute later. (Both editors share the sign-in.)
 
 ## What's already wired up
+
+- **The website editor (`edit/`)** — clients click the real page to change it.
+  It reads `admin/config.yml` for every section and field, so it needs no
+  per-client setup. Before giving it to a client, prove it draws this site
+  exactly like Jekyll does (both must say they passed):
+  `bundle exec jekyll build -d /tmp/built && node ../ops/tools/editor-parity/parity.mjs . edit/render.js /tmp/built`
+  and `node ../ops/tools/editor-parity/coverage.mjs .`
+  Site-only extras (e.g. a thumbnail folder, named link words) go in
+  `edit/settings.yml` — see montaire-rally-demo's for an example.
 
 - **Login** — `admin/config.yml`'s `backend.base_url` needs pointing at
   this client's own `<slug>-cms-auth` Cloudflare Worker (step 0 above) —

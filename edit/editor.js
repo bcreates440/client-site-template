@@ -23,6 +23,7 @@ const { markedRender, probeImages, valuePaths } = await import(`./fields.js${V}`
 const { mapDom, mapImages, escapeText, htmlToText, cleanHtml } = await import(`./dom.js${V}`);
 const { drawForm, field, fieldAt, blockType } = await import(`./panel.js${V}`);
 const { shrink, fileName, loadUploads, saveUploads } = await import(`./media.js${V}`);
+const { check, publish, Conflict, updateSitemap } = await import(`./publish.js${V}`);
 
 const $ = (id) => document.getElementById(id);
 const SITE_ROOT = new URL("../", location.href).href;
@@ -140,6 +141,7 @@ async function gh(path, opts = {}) {
       Accept: "application/vnd.github+json",
       Authorization: `Bearer ${state.token}`,
       "X-GitHub-Api-Version": "2022-11-28",
+      ...(opts.body ? { "Content-Type": "application/json" } : {}),
       ...opts.headers,
     },
   });
@@ -153,7 +155,7 @@ const fromBase64 = (b64) =>
 
 // Everything the renderer and editor read. Pictures aren't downloaded: the
 // preview loads them from the live site.
-const WANTED = /^(_layouts|_includes|_data|_content)\/.+\.(html|ya?ml)$|^_config\.yml$|^admin\/config\.yml$/;
+const WANTED = /^(_layouts|_includes|_data|_content)\/.+\.(html|ya?ml)$|^_config\.yml$|^admin\/config\.yml$|^sitemap\.xml$/;
 
 async function loadFiles() {
   const branch = await gh(`/repos/${state.repo}/branches/${encodeURIComponent(state.branch)}`);
@@ -294,6 +296,7 @@ function changed({ redrawPanel = false } = {}) {
   saveDraft();
   const n = changedFiles().length;
   $("saved").textContent = n ? "Changes saved on this computer" : "";
+  $("publish-btn").disabled = !n;
   $("undo").disabled = !state.undo.length;
   $("redo").disabled = !state.redo.length;
   clearTimeout(redrawTimer);
@@ -828,6 +831,266 @@ function deletePage(page) {
   say(`"${page.title}" deleted. Press Undo to bring it back.`);
 }
 
+// ------------------------------------------------------------- publishing ---
+const el = (tag, props = {}, ...kids) => {
+  const e = Object.assign(document.createElement(tag), props);
+  e.append(...kids.filter((k) => k != null));
+  return e;
+};
+const liveBranch = () => state.config.backend.branch || "main";
+const fileLabel = (p) => state.pages.find((x) => x.path === p)?.title
+  ?? state.dataFiles.find((d) => d.file === p)?.label
+  ?? (p.startsWith("_content/") ? `a deleted page (${p.slice(9)})` : p);
+
+// New pictures that something still uses (an undone upload is left behind).
+function usedUploads() {
+  const all = [...state.files.values()].join("\n");
+  return Object.fromEntries(Object.entries(state.uploads).filter(([p]) => all.includes(p.split("/").pop())));
+}
+
+function publishDialog(...content) {
+  $("publish-body").replaceChildren(...content);
+  if (!$("publish").open) $("publish").showModal();
+}
+const closeBtn = (text = "Close") => el("button", { type: "button", className: "btn-tool", textContent: text, onclick: () => $("publish").close() });
+
+function startPublish() {
+  const changes = changedFiles();
+  if (!changes.length) return say("There's nothing new to publish.");
+  if (state.stale) {
+    return publishDialog(el("h2", { textContent: "Reload the editor first" }),
+      el("p", { textContent: "The website was changed somewhere else while you worked. Reload this page to pick up those changes - yours are saved on this computer and will come back." }),
+      el("div", { className: "modal-actions" }, closeBtn("OK")));
+  }
+  const pages = changes.filter(([p, t]) => p.startsWith("_content/") && t != null)
+    .map(([p]) => ({ path: p, title: fileLabel(p), data: dataOf(p) }));
+  const problems = check(pages, state.pageFields, (t) => blockType(state.pageFields, t));
+  if (problems.length) {
+    return publishDialog(
+      el("h2", { textContent: "A few things to fix first" }),
+      el("p", { textContent: "These need filling in before your changes can go live:" }),
+      el("ul", { className: "problems" }, ...problems.slice(0, 12).map((pr) => el("li", {},
+        el("span", { textContent: `${pr.where}: ${pr.message} ` }),
+        el("button", {
+          type: "button", className: "btn-tool", textContent: "Show me",
+          onclick: async () => {
+            $("publish").close();
+            if (state.current !== pr.file) await goTo(pr.file);
+            if (pr.path[0] === "blocks") select(pr.path[1], pr.path); else select("page", pr.path);
+          },
+        })))),
+      problems.length > 12 ? el("p", { textContent: `…and ${problems.length - 12} more.` }) : null,
+      el("div", { className: "modal-actions" }, closeBtn("OK")),
+    );
+  }
+  const pics = Object.keys(usedUploads()).filter((p) => !state.settings.thumbnails?.folder || !p.startsWith(state.settings.thumbnails.folder)).length;
+  const names = [...new Set(changes.map(([p]) => fileLabel(p)))];
+  const test = state.branch !== liveBranch();
+  publishDialog(
+    el("h2", { textContent: test ? "Publish to the test copy?" : "Publish your changes?" }),
+    el("p", { textContent: `Changes to: ${names.join(", ")}${pics ? `, plus ${pics} new picture${pics > 1 ? "s" : ""}` : ""}.` }),
+    el("p", { className: "hint", textContent: test
+      ? `This saves to the test copy ("${state.branch}"), not the live website.`
+      : "They'll be on your website about a minute after you publish. You can always go back to an earlier version." }),
+    el("div", { className: "modal-actions" },
+      el("button", { type: "button", className: "btn-primary", textContent: "Publish now", onclick: () => doPublish(false) }),
+      closeBtn("Not yet")),
+  );
+}
+
+// Pages added, changed or deleted -> the site's sitemap.xml, if it has one.
+function sitemapUpdate() {
+  if (!state.files.has("sitemap.xml")) return null;
+  const pages = changedFiles().filter(([p]) => p.startsWith("_content/")).map(([p, t]) => {
+    const src = t ?? state.original.get(p) ?? "";
+    return {
+      permalink: (YAML.parse(src.match(FM)?.[1] ?? "") ?? {}).permalink,
+      kind: t == null ? "deleted" : state.original.has(p) ? "changed" : "added",
+    };
+  });
+  const siteUrl = (YAML.parse(state.files.get("_config.yml") ?? "") ?? {}).url;
+  return updateSitemap(state.files.get("sitemap.xml"), pages, siteUrl, new Date().toISOString().slice(0, 10));
+}
+
+async function doPublish(overwrite) {
+  const names = [...new Set(changedFiles().map(([p]) => fileLabel(p)))];
+  const sitemapBefore = state.files.get("sitemap.xml");
+  const sitemap = sitemapUpdate();
+  if (sitemap != null) state.files.set("sitemap.xml", sitemap);
+  const changes = changedFiles();
+  const uploads = usedUploads();
+  const status = el("p", { textContent: "Starting…" });
+  publishDialog(el("h2", { textContent: "Publishing…" }), el("div", { className: "spinner" }), status);
+  try {
+    const { sha, theirs } = await publish({
+      gh, repo: state.repo, branch: state.branch, base: state.base, changes, uploads, overwrite,
+      message: `Website editor: ${names.join(", ")}`,
+      onStep: (s) => (status.textContent = s),
+    });
+    // What's on GitHub now is the new starting point.
+    for (const [p, t] of changes) { if (t == null) state.original.delete(p); else state.original.set(p, t); }
+    // Bring in what was changed elsewhere, so it can't be overwritten later.
+    // (The publish itself has already succeeded by this point.)
+    try {
+      for (const p of theirs.filter((x) => WANTED.test(x))) {
+        try {
+          const f = await gh(`/repos/${state.repo}/contents/${p.split("/").map(encodeURIComponent).join("/")}?ref=${sha}`);
+          const text = fromBase64(f.content).replace(/\r\n/g, "\n");
+          state.original.set(p, text);
+          state.files.set(p, text);
+        } catch (err) {
+          if (!/ 404 /.test(err.message)) throw err;
+          state.original.delete(p); // deleted elsewhere
+          state.files.delete(p);
+        }
+        state.docs.delete(p);
+      }
+      if (theirs.length) { listPages(); if (!state.files.has(state.current)) state.current = state.pages[0].path; draw(); }
+    } catch (err) {
+      console.error(err);
+      state.stale = true; // the next publish must not trust these copies
+    }
+    for (const p of Object.keys(uploads)) state.tree.add(p);
+    state.base = sha;
+    state.uploads = {};
+    await saveUploads(draftKey(), {});
+    changed();
+    afterPublish(sha);
+  } catch (err) {
+    // Not published: the sitemap goes back to how it was (it's redone next time).
+    if (sitemapBefore != null) state.files.set("sitemap.xml", sitemapBefore);
+    if (err instanceof Conflict) {
+      return publishDialog(
+        el("h2", { textContent: "Someone else changed this too" }),
+        el("p", { textContent: `While you were editing, these were also changed somewhere else: ${err.files.map(fileLabel).join(", ")}.` }),
+        el("p", { className: "hint", textContent: "Publishing yours replaces their version of those. Theirs isn't lost: it stays in History." }),
+        el("div", { className: "modal-actions" },
+          el("button", { type: "button", className: "btn-primary", textContent: "Publish mine anyway", onclick: () => doPublish(true) }),
+          closeBtn("Cancel")),
+      );
+    }
+    if (err instanceof SignedOut) {
+      $("publish").close();
+      return askToSignIn("Your sign-in expired. Sign in again - your changes are safe on this computer.");
+    }
+    console.error(err);
+    publishDialog(
+      el("h2", { textContent: "That didn't publish" }),
+      el("p", { textContent: navigator.onLine ? `Something went wrong (${err.message}). Your changes are safe on this computer - try again in a minute.` : "You seem to be offline. Your changes are safe on this computer - publish again once you're back online." }),
+      el("div", { className: "modal-actions" },
+        el("button", { type: "button", className: "btn-primary", textContent: "Try again", onclick: () => doPublish(overwrite) }),
+        closeBtn()),
+    );
+  }
+}
+
+// After publishing: say when it's actually live. GitHub Pages builds the
+// site after each commit; its build status says when that's done.
+async function afterPublish(sha) {
+  const site = state.config.site_url;
+  const viewLink = site ? el("a", { className: "btn-primary", href: site, target: "_blank", rel: "noopener", textContent: "View your website" }) : null;
+  if (state.branch !== liveBranch()) {
+    say("Saved to the test copy.");
+    return publishDialog(el("h2", { textContent: "Saved to the test copy" }),
+      el("p", { textContent: `Your changes are saved to "${state.branch}". The live website hasn't changed.` }),
+      el("div", { className: "modal-actions" }, closeBtn("Done")));
+  }
+  const note = el("p", { textContent: "Your website is updating. This usually takes about a minute - you can keep working." });
+  publishDialog(el("h2", { textContent: "Published" }), note, el("div", { className: "modal-actions" }, closeBtn("Keep working")));
+  say("Published. Your website is updating.", { sticky: true });
+  for (let i = 0; i < 40; i++) {
+    await new Promise((r) => setTimeout(r, 6000));
+    let build;
+    try { build = await gh(`/repos/${state.repo}/pages/builds/latest`); } catch { break; } // no access to build status: stop checking
+    if (build.commit !== sha) continue;
+    if (build.status === "built") {
+      note.textContent = "Your changes are live.";
+      if (viewLink) note.after(viewLink);
+      say("Your changes are live.");
+      return;
+    }
+    if (build.status === "errored") {
+      note.textContent = "Your changes are saved, but the website couldn't update. Please let Blake know - nothing is lost.";
+      say("The website couldn't update - please let Blake know.", { sticky: true });
+      return;
+    }
+  }
+  note.textContent = "Published. Your website should show the changes within a few minutes.";
+  if (viewLink) note.after(viewLink);
+  say("Published.");
+}
+
+// --------------------------------------------------------- previous versions ---
+let previewing = null;
+async function openHistory() {
+  const path = state.current;
+  publishDialog(el("h2", { textContent: "Previous versions of this page" }), el("div", { className: "spinner" }));
+  let commits;
+  try {
+    commits = await gh(`/repos/${state.repo}/commits?path=${encodeURIComponent(path)}&sha=${encodeURIComponent(state.branch)}&per_page=20`);
+  } catch (err) {
+    return publishDialog(el("h2", { textContent: "Previous versions" }), el("p", { textContent: "They couldn't be loaded just now. Try again in a minute." }), el("div", { className: "modal-actions" }, closeBtn()));
+  }
+  const when = (c) => new Date(c.commit.author.date).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  publishDialog(
+    el("h2", { textContent: `Previous versions of "${fileLabel(path)}"` }),
+    el("p", { className: "hint", textContent: "Look at any earlier version. If you want it back, restore it, then publish." }),
+    el("ul", { className: "versions" }, ...commits.map((c, i) => el("li", {},
+      el("span", { textContent: `${when(c)}${i === 0 ? " (what's published now)" : ""} - ${c.commit.message.split("\n")[0]}` }),
+      i === 0 ? null : el("button", { type: "button", className: "btn-tool", textContent: "Look at it", onclick: () => previewVersion(path, c, when(c)) })))),
+    el("div", { className: "modal-actions" }, closeBtn()),
+  );
+}
+
+async function previewVersion(path, commit, when) {
+  $("publish").close();
+  try {
+    const file = await gh(`/repos/${state.repo}/contents/${path.split("/").map(encodeURIComponent).join("/")}?ref=${commit.sha}`);
+    const text = fromBase64(file.content).replace(/\r\n/g, "\n");
+    const data = YAML.parse(text.match(FM)?.[1] ?? "") ?? {};
+    const html = await state.render(path, { data });
+    previewing = { path, text, when };
+    $("history-text").textContent = `You're looking at this page as it was on ${when}.`;
+    $("history-bar").hidden = false;
+    $("panel").hidden = true;
+    // Look, don't touch: nothing in an old version can be clicked.
+    $("frame").srcdoc = withUploads(html).replace(/<head([^>]*)>/i, `<head$1><base href="${SITE_ROOT}"><style>*{pointer-events:none!important}</style>`);
+  } catch (err) {
+    console.error(err);
+    say("That version couldn't be shown. Try another one.");
+  }
+}
+function endPreview() {
+  previewing = null;
+  $("history-bar").hidden = true;
+  draw();
+}
+function restoreVersion() {
+  const { path, text, when } = previewing;
+  remember(path);
+  state.files.set(path, text);
+  state.docs.delete(path);
+  endPreview();
+  changed({ redrawPanel: true });
+  say(`The version from ${when} is back. Publish to make it live.`, { sticky: true });
+}
+
+// ------------------------------------------------------------------ help ---
+function openHelp(first = false) {
+  publishDialog(
+    el("h2", { textContent: first ? "Welcome to your website editor" : "How the editor works" }),
+    el("ol", { className: "tips" },
+      el("li", {}, el("strong", { textContent: "Click any words or picture " }), "on the page to change them. Press Enter when you're done, or Esc to cancel."),
+      el("li", {}, el("strong", { textContent: "Point at a section " }), "to move it, copy it, remove it, or add a new one below it."),
+      el("li", {}, el("strong", { textContent: "Check the phone view " }), "with the Computer / Phone switch at the top."),
+      el("li", {}, el("strong", { textContent: "Press Publish " }), "when you're happy. Until then your changes are saved on this computer only, and Undo takes back any step.")),
+    el("p", { className: "hint", textContent: "Changed something by mistake after publishing? History lets you look at and restore any earlier version of a page." }),
+    first ? null : el("p", { className: "hint" }, "Need a setting that isn't here? ",
+      el("a", { href: "../admin/", textContent: "Open the advanced editor" }), "."),
+    el("div", { className: "modal-actions" }, closeBtn(first ? "Start editing" : "Close")),
+  );
+}
+
 // --------------------------------------------------------- typing in place ---
 function startEdit(el) {
   const doc = el.ownerDocument;
@@ -957,6 +1220,7 @@ function imagePaths(data) {
 let drawing = 0;
 async function draw() {
   const ticket = ++drawing;
+  if (previewing) { previewing = null; $("history-bar").hidden = true; } // any change ends looking at an old version
   const frame = $("frame");
   const scroll = frame.contentWindow?.scrollY ?? 0;
   const data = pageData();
@@ -1022,7 +1286,12 @@ async function open() {
     show("workspace");
     await offerDraft();
     await goTo(state.pages[0].path);
-    say("Click any words or pictures on the page to change them.");
+    changed();
+    // First time on this computer: the four things worth knowing.
+    let welcomed = false;
+    try { welcomed = !!localStorage.getItem("site-editor.welcomed"); localStorage.setItem("site-editor.welcomed", "1"); } catch {}
+    if (!welcomed) openHelp(true);
+    else say("Click any words or pictures on the page to change them.");
   } catch (err) {
     if (err instanceof SignedOut) {
       try { localStorage.removeItem(TOKEN_KEY); } catch {}
@@ -1049,7 +1318,7 @@ async function start() {
   state.repo = state.config.backend.repo;
   // ?branch= lets Blake try the editor on a test branch.
   state.branch = new URLSearchParams(location.search).get("branch") || state.config.backend.branch || "main";
-  $("site-name").textContent = state.config.site_url ? new URL(state.config.site_url).hostname : "Your website";
+  if (state.config.site_url) document.title = `Edit ${new URL(state.config.site_url).hostname}`;
 
   $("page-select").onchange = (e) => {
     if (e.target.value === "__new") { e.target.value = state.current; openNewPage(); }
@@ -1066,6 +1335,11 @@ async function start() {
   $("panel-form").addEventListener("submit", (e) => e.preventDefault()); // Enter in a box must not reload
   // Keep the Google preview in step with what's typed.
   $("panel-form").addEventListener("input", () => $("panel-form").querySelector(".google")?.dispatchEvent(new Event("ed-refresh")));
+  $("publish-btn").onclick = startPublish;
+  $("history-btn").onclick = openHistory;
+  $("help-btn").onclick = () => openHelp();
+  $("history-restore").onclick = restoreVersion;
+  $("history-back").onclick = endPreview;
   $("undo").onclick = () => restore(state.undo, state.redo);
   $("redo").onclick = () => restore(state.redo, state.undo);
   document.addEventListener("keydown", (e) => {
