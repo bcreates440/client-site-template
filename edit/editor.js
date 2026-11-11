@@ -435,7 +435,11 @@ function withUploads(html) {
 // --------------------------------------------------------------- links ---
 // Pages are linked the way this site already links them: /about/ style
 // when its pages end in a slash, about.html style otherwise.
+// Sites whose host drops ".html" (edit/settings.yml: page_links: extensionless)
+// link as contact and ./ instead.
+const extensionless = () => state.settings.page_links === "extensionless";
 function pageLink(permalink) {
+  if (extensionless()) return permalink === "/" || permalink === "/index.html" ? "./" : permalink.replace(/^\//, "").replace(/\.html$/, "");
   const slashStyle = state.pages.some((p) => p.permalink?.endsWith("/") && p.permalink !== "/");
   if (slashStyle) return permalink;
   return permalink === "/" ? "index.html" : permalink.replace(/^\//, "");
@@ -909,7 +913,7 @@ function sitemapUpdate() {
     };
   });
   const siteUrl = (YAML.parse(state.files.get("_config.yml") ?? "") ?? {}).url;
-  return updateSitemap(state.files.get("sitemap.xml"), pages, siteUrl, new Date().toISOString().slice(0, 10));
+  return updateSitemap(state.files.get("sitemap.xml"), pages, siteUrl, new Date().toISOString().slice(0, 10), { extensionless: extensionless() });
 }
 
 async function doPublish(overwrite) {

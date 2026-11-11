@@ -69,12 +69,18 @@ function walk(fields, value, path, where, file, problems) {
  * Google hears about new pages and nobody has to remember to edit it.
  *   pages: [{ permalink, kind: "added" | "changed" | "deleted" }]
  *   siteUrl: _config.yml's url; today: "YYYY-MM-DD"
- * Pages are matched by address, trying both "/" and "/index.html" forms.
+ *   extensionless: the host serves /contact for contact.html, so the
+ *     sitemap lists addresses without ".html"
+ * Pages are matched by address in any of those forms.
  */
-export function updateSitemap(xml, pages, siteUrl, today) {
-  const root = String(siteUrl ?? "").replace(/\/$/, "");
+export function updateSitemap(xml, pages, siteUrl, today, { extensionless = false } = {}) {
+  // The sitemap's own home-page entry says what address the site really
+  // lives at; _config.yml's url can lag behind a move.
+  const home = xml.match(/<loc>(https?:\/\/[^<]*?)\/(?:index\.html)?<\/loc>/);
+  const root = (home?.[1] ?? String(siteUrl ?? "")).replace(/\/$/, "");
   const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const forms = (p) => [...new Set([p, p.replace(/\/index\.html$/, "/"), p.replace(/\/$/, "/index.html")])].map((x) => root + x);
+  const bare = (p) => p.replace(/\/index\.html$/, "/").replace(/\.html$/, "");
+  const forms = (p) => [...new Set([p, p.replace(/\/index\.html$/, "/"), p.replace(/\/$/, "/index.html"), bare(p)])].map((x) => root + x);
   const block = (loc) => new RegExp(`[ \\t]*<url>\\s*<loc>${esc(loc)}</loc>[\\s\\S]*?</url>\\n?`);
   const find = (p) => forms(p).find((loc) => block(loc).test(xml));
   for (const { permalink, kind } of pages) {
@@ -84,7 +90,7 @@ export function updateSitemap(xml, pages, siteUrl, today) {
     if (loc) {
       xml = xml.replace(block(loc), (b) => b.replace(/<lastmod>[^<]*<\/lastmod>/, `<lastmod>${today}</lastmod>`));
     } else if (kind === "added") {
-      const entry = `  <url><loc>${root}${permalink}</loc>\n       <lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>\n`;
+      const entry = `  <url><loc>${root}${extensionless ? bare(permalink) : permalink}</loc>\n       <lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>\n`;
       xml = xml.replace(/<\/urlset>/, `${entry}</urlset>`);
     }
   }
