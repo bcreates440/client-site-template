@@ -56,6 +56,7 @@ const state = {
   fields: [],           // marker id -> path, for the page on screen
   images: [],           // picture index -> path, for the page on screen
   selected: null,       // section index, "page", or null
+  barOff: false,        // section toolbar put away with "Hide toolbar"
   dataFile: null,       // site-wide file shown in the panel, or null
   undo: [],
   redo: [],
@@ -696,6 +697,7 @@ function sectionBar(doc) {
   const tools = [
     ["Move up", "up"], ["Move down", "down"], ["Duplicate", "copy"],
     ["Remove", "remove"], ["Settings", "settings"], ["+ Add section below", "add"],
+    ["Hide toolbar", "hide"],
   ];
   for (const [label, op] of tools) {
     const b = doc.createElement("button");
@@ -710,11 +712,29 @@ function sectionBar(doc) {
     e.stopPropagation();
     const op = e.target.closest("button")?.dataset.op;
     if (!op || current == null) return;
+    if (op === "hide") return hideBar(true);
     if (op === "settings") select(current);
     else if (op === "add") openPicker(current);
     else sectionOp(op, current);
   }, true);
   doc.body.append(bar);
+
+  // "Hide toolbar" puts it away (it can cover the page, most of all on a
+  // phone) until the small corner button brings it back. Kept in state so
+  // it stays hidden while the preview redraws after each change.
+  const show = doc.createElement("button");
+  show.type = "button";
+  show.className = "ed-bar ed-show";
+  show.textContent = "Show toolbar";
+  show.hidden = !state.barOff;
+  show.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); hideBar(false); }, true);
+  doc.body.append(show);
+  const hideBar = (off) => {
+    state.barOff = off;
+    show.hidden = !off;
+    bar.hidden = off;
+    if (!off && current != null) place(current);
+  };
 
   const win = doc.defaultView;
   // How far down the window a pinned header (sticky or fixed menu bar)
@@ -734,10 +754,15 @@ function sectionBar(doc) {
     const el = [...doc.querySelectorAll(`[data-ed-block="${n}"]`)].find((x) => x.getBoundingClientRect().height > 0);
     if (!el) return;
     current = n;
+    if (state.barOff) return;
     name.textContent = typeLabel(n);
     bar.querySelector('[data-op="up"]').disabled = n === 0;
     bar.querySelector('[data-op="down"]').disabled = n === blockCount() - 1;
     bar.hidden = false;
+    // Measure at the left edge, where it has full room: measured where it
+    // last sat it may be squeezed onto extra rows, and then creeps left
+    // a step with every mouse move.
+    bar.style.left = "0px";
     const r = el.getBoundingClientRect();
     // At the top of its section, but never under a pinned header, and
     // never past the section's own bottom edge.
@@ -1196,6 +1221,7 @@ const PREVIEW_CSS = `
   .ed-bar button:disabled { opacity: .45; cursor: default; }
   .ed-bar button:focus-visible { outline: 3px solid #8fb0ff; outline-offset: 1px; }
   .ed-bar .ed-danger { color: #b42318; }
+  .ed-bar.ed-show { position: fixed; right: 8px; bottom: 8px; padding: 8px 12px; border: 0; color: #fff; cursor: pointer; }
 `;
 
 function wire(doc) {
