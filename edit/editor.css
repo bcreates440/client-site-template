@@ -75,6 +75,7 @@ button.btn-quiet { border: 0; background: none; cursor: pointer; }
 .panel-head h2 { margin: 0; font-size: 1.1rem; }
 .panel-form { overflow-y: auto; overflow-x: hidden; padding: 1rem; }
 .field { margin-bottom: 1rem; }
+.field.ed-linked { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
 .field > label { display: block; font-weight: 600; margin-bottom: .25rem; }
 .field .req { color: var(--danger); }
 .field input[type="text"], .field input[type="number"], .field textarea, .field select {

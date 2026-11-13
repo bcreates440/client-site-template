@@ -28,6 +28,9 @@ const { check, publish, Conflict, updateSitemap } = await import(`./publish.js${
 const $ = (id) => document.getElementById(id);
 const SITE_ROOT = new URL("../", location.href).href;
 const TOKEN_KEY = "site-editor.token";
+// Email sign-in (client-sites-auth/email). Its sessions start "ses." and its
+// GitHub calls go through it; GitHub sign-ins call GitHub directly.
+const EMAIL_SIGNIN = "https://client-sites-email.bcreates440.workers.dev";
 // Page settings a client should never need to touch (they break links).
 const HIDDEN_PAGE_FIELDS = new Set(["slug", "permalink", "layout", "blocks"]);
 
@@ -92,12 +95,17 @@ function storedToken() {
 // Same popup handshake Sveltia/Decap use, so each client's existing sign-in
 // worker works unchanged: the popup says "authorizing", we echo it back, and
 // it answers with the token.
-function signInPopup() {
+function githubSignInUrl() {
   const { base_url, auth_endpoint = "auth" } = state.config.backend;
   const url = new URL(auth_endpoint, base_url.replace(/\/?$/, "/"));
   url.searchParams.set("provider", "github");
   url.searchParams.set("site_id", location.hostname);
   url.searchParams.set("scope", "repo");
+  return url;
+}
+
+// The email sign-in (client-sites-auth/email) answers with the same messages.
+function signInPopup(url) {
   const popup = window.open(url, "site-editor-signin", "width=600,height=760");
   if (!popup) return Promise.reject(new Error("Your browser blocked the sign-in window. Allow pop-ups for this site and try again."));
   const workerOrigin = url.origin;
@@ -120,22 +128,25 @@ function signInPopup() {
 function askToSignIn(message = "") {
   show("screen-signin");
   $("signin-error").textContent = message;
-  $("signin").onclick = async () => {
+  $("signin-email").onclick = () => signIn(new URL(`${EMAIL_SIGNIN}/login`));
+  $("signin").onclick = () => signIn(githubSignInUrl());
+  async function signIn(url) {
     $("signin-error").textContent = "";
     try {
-      state.token = await signInPopup();
+      state.token = await signInPopup(url);
       try { localStorage.setItem(TOKEN_KEY, state.token); } catch {}
       await open();
     } catch (err) {
       $("signin-error").textContent = err.message;
     }
-  };
+  }
 }
 
 // ---------------------------------------------------------------- GitHub ---
 class SignedOut extends Error {}
 async function gh(path, opts = {}) {
-  const res = await fetch(`https://api.github.com${path}`, {
+  const api = state.token.startsWith("ses.") ? `${EMAIL_SIGNIN}/api` : "https://api.github.com";
+  const res = await fetch(`${api}${path}`, {
     ...opts,
     headers: {
       Accept: "application/vnd.github+json",
@@ -546,6 +557,33 @@ function highlight() {
   if (!doc) return;
   doc.querySelectorAll(".ed-selected").forEach((el) => el.classList.remove("ed-selected"));
   if (typeof state.selected === "number") doc.querySelectorAll(`[data-ed-block="${state.selected}"]`).forEach((el) => el.classList.add("ed-selected"));
+}
+
+// Pointing at words or a picture on the page lights up its box in the
+// settings panel, and pointing at a box lights up its spot on the page.
+const LINKED = "[data-ed-f], [data-ed-near], [data-ed-img]";
+const pathOf = (el) => el.dataset.edImg != null ? state.images[+el.dataset.edImg] : state.fields[+(el.dataset.edF ?? el.dataset.edNear)];
+function markLinked(root, els) {
+  root.querySelectorAll(".ed-linked").forEach((x) => x.classList.remove("ed-linked"));
+  els.forEach((x) => x.classList.add("ed-linked"));
+}
+function linkFromPage(doc) {
+  doc.addEventListener("mouseover", (e) => {
+    const el = e.target.closest?.(LINKED);
+    const path = el && pathOf(el);
+    const box = path && $("panel-form").querySelector(`[data-path='${JSON.stringify(path)}']`)?.closest(".field");
+    markLinked($("panel-form"), box ? [box] : []);
+    box?.scrollIntoView({ block: "nearest" });
+  });
+  doc.addEventListener("mouseout", (e) => { if (!e.relatedTarget) markLinked($("panel-form"), []); });
+}
+function linkFromPanel(e) {
+  const doc = $("frame").contentDocument;
+  if (!doc) return;
+  const key = e.type === "mouseover" && e.target.closest(".field")?.querySelector("[data-path]")?.dataset.path;
+  const spots = key ? [...doc.querySelectorAll(LINKED)].filter((x) => JSON.stringify(pathOf(x)) === key) : [];
+  markLinked(doc, spots);
+  spots[0]?.scrollIntoView({ block: "nearest" });
 }
 
 // --------------------------------------------------------------- sections ---
@@ -1145,6 +1183,7 @@ const PREVIEW_CSS = `
   [data-ed-f]:focus-visible, [data-ed-img]:focus-visible { outline: 3px solid #2357d9; outline-offset: 3px; }
   [contenteditable] { outline: 3px solid #2357d9 !important; outline-offset: 3px; cursor: text; }
   [data-ed-block].ed-selected { box-shadow: inset 0 0 0 3px #2357d9; }
+  .ed-linked { outline: 3px solid #2357d9 !important; outline-offset: 3px; }
   a, button, summary, label { cursor: pointer; }
   /* The section toolbar. Reset first so the site's own styles can't reach it. */
   .ed-bar, .ed-bar * { all: revert; box-sizing: border-box; font: 500 13px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: normal; text-transform: none; }
@@ -1172,6 +1211,7 @@ function wire(doc) {
     el.setAttribute("aria-label", "Change this picture");
   }
   sectionBar(doc);
+  linkFromPage(doc);
   doc.addEventListener("click", (e) => {
     if (e.target.closest("[contenteditable], .ed-bar")) return;
     // Nothing in the preview navigates: links and buttons are for editing.
@@ -1364,6 +1404,7 @@ async function start() {
   };
   $("site-select").onchange = (e) => { if (e.target.value) openDataFile(e.target.value); e.target.value = ""; };
   $("page-settings").onclick = () => select("page");
+  $("panel-form").onmouseover = $("panel-form").onmouseleave = linkFromPanel;
   $("add-section").onclick = () => openPicker(typeof state.selected === "number" ? state.selected : null);
   $("picker-close").onclick = () => $("picker").close();
   $("newpage-form").addEventListener("submit", createPage);

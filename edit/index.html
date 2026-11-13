@@ -11,7 +11,7 @@ sitemap: false
 <!-- Only this site, the two pinned library CDNs and GitHub's API may run or be
      contacted. The site preview inherits this policy and runs no scripts at
      all (sandboxed iframe), so nothing in page content can reach the token. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com; connect-src 'self' https://api.github.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com; connect-src 'self' https://api.github.com https://client-sites-email.bcreates440.workers.dev; img-src 'self' data: blob: https:; media-src 'self' blob: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self'; base-uri 'self'; form-action 'none'">
 <title>Edit your website</title>
 {%- comment -%}
   ?v= is the build time: every update gets fresh file names, so browsers
@@ -63,8 +63,9 @@ sitemap: false
 <main class="stage" id="stage">
   <section class="card-center" id="screen-signin" hidden>
     <h1>Edit your website</h1>
-    <p>Sign in to make changes. You'll use the same GitHub account as before.</p>
-    <button type="button" class="btn-primary" id="signin">Sign in with GitHub</button>
+    <p>Sign in to make changes. We'll email you a code - no password needed.</p>
+    <button type="button" class="btn-primary" id="signin-email">Sign in with email</button>
+    <button type="button" class="btn-tool" id="signin">Sign in with GitHub</button>
     <p class="error" id="signin-error" role="alert"></p>
     <p class="hint">Trouble signing in? <a href="../admin/">Sign in through the advanced editor</a>, then come back to this page - you'll be signed in here too.</p>
   </section>
