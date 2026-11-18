@@ -38,6 +38,11 @@ exclude:
   - check.rb
   - wrangler.toml
   - README.md
+  # Hand-over docs added at launch. Listed here so they are never built as
+  # stray pages (which also fails check.rb on a missing sitemap entry).
+  - RUNBOOK.md
+  - README-EDITING.md
+  - CLAUDE.md
 
 # Keep the built output tidy and predictable.
 sass:

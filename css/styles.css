@@ -376,8 +376,8 @@ tbody tr:nth-child(even){background:var(--stripe)}
 .band-navy .hours li{border-color:rgba(255,255,255,.18)}
 
 /* ---------- CALLOUTS ---------- */
-.note{border-left:5px solid var(--red);background:var(--note-bg);padding:1.1rem 1.3rem;
-  border-radius:0 var(--radius) var(--radius) 0;margin:1.6rem 0;color:var(--ink)}
+.note{border:1px solid var(--red);background:var(--note-bg);padding:1.1rem 1.3rem;
+  border-radius:var(--radius);margin:1.6rem 0;color:var(--ink)}
 .note p:last-child{margin-bottom:0}
 .note strong{color:var(--red-dark)}
 .alert{border-left-color:var(--gold);background:var(--alert-bg)}

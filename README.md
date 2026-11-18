@@ -12,6 +12,10 @@ from a live site; the content is placeholder text for you to replace.
 
 ## Spin up a new client site
 
+The staged version of these steps, with approval stops, is
+`ops/pipelines/client-site-build/CONTEXT.md`. It does step 0 at launch
+instead of first, leaving `backend.base_url` as the placeholder until then.
+
 0. Provision the client's own Cloudflare Worker for CMS login — see
    `ops/templates/onboarding.md`, "CMS Auth Setup". Do this before the
    steps below; you'll need the worker URL for step 2.
@@ -37,7 +41,9 @@ from a live site; the content is placeholder text for you to replace.
 6. Replace `images/logo.png` with the client's real logo (same file name,
    or update the references in `_includes/header.html`,
    `_includes/footer.html` and `admin/config.yml`'s `logo_url`).
-7. Run `ruby check.rb` — must say `ALL CHECKS PASSED` before you push.
+7. Run `bundle exec jekyll build`, then `ruby check.rb` — it must say
+   `ALL CHECKS PASSED` before you push. Build first: without a fresh `_site/`
+   folder the built-page checks are skipped and it still passes.
 8. `git push`. Then in the Cloudflare dashboard: **Workers & Pages → Create →
    Import a repository**, pick the new repo, and set the build command to
    `bundle install && bundle exec jekyll build` (leave the deploy command
@@ -71,9 +77,12 @@ from a live site; the content is placeholder text for you to replace.
   each client gets an isolated worker so one broken worker can't take down
   every client's editor at once.
 - **Block system** — `_layouts/page.html` renders a page from a list of
-  typed sections (hero, prose, cards, split, table, gallery, strip,
-  carousel, people, stats, cta, raw). See `_includes/blocks/` for each
-  one's fields, and `_content/index.html` for a worked example.
+  typed sections: pagehead, hero, prose, cards, split, table, gallery,
+  people, cta, strip, carousel, stats, testimonials, faq, trustbar,
+  showcase, bignumber, banner, beforeafter, hours and raw. The list in
+  `_layouts/page.html` is the truth if this one falls behind. See
+  `_includes/blocks/` for each one's fields, and `_content/index.html` for a
+  worked example.
 - **`check.rb`** — walks `admin/config.yml`'s own field list, so it stays
   correct as you add fields — just remember to add new fields to
   `admin/config.yml` too, or the editor will silently delete them on save

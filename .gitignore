@@ -13,3 +13,7 @@ desktop.ini
 
 # Wrangler local dev cache
 .wrangler/
+
+# Local Claude Code / Impeccable tooling (never ships to a client repo)
+.claude/
+.impeccable/
